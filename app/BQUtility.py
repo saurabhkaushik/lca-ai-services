@@ -180,8 +180,10 @@ class BQUtility:
             print("Encountered errors while inserting rows: {}".format(errors))
         return uuid
 
-    def get_training_data(self): 
+    def get_training_data(self, type="all"): 
         uuid_query = "SELECT * from " + self.table_id3 
+        if not type == "all":
+            uuid_query = "SELECT * from " + self.table_id3 + " where type=/'" + type + "/'"
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
         return results

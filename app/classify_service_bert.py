@@ -1,4 +1,5 @@
 from transformers import AutoModelForSequenceClassification
+from transformers import BertForSequenceClassification
 import json 
 from transformers import AutoTokenizer
 from transformers import pipeline
@@ -13,9 +14,10 @@ from app.BQUtility import BQUtility
 
 from app.highlight_service import highlight_service
 
-model_checkpoint = "distilbert-base-uncased"
+model_checkpoint = "facebook/bart-large-mnli" # "distilbert-base-uncased"
+classification = "zero-shot-classification" # "text-classification"
 
-class classify_service:
+class classify_service_bert:
 
     tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
     high_service = highlight_service()
@@ -41,9 +43,9 @@ class classify_service:
 
         return encodings
 
-    def prepare_train_dataset(self): 
+    def prepare_train_dataset(self, type="all"): 
         processed_data = []    
-        train_data = self.dbutil.get_training_data()
+        train_data = self.dbutil.get_training_data(type)
         
         label_count = 0
         for row in train_data:        
@@ -53,7 +55,7 @@ class classify_service:
                 self.label_x.update({label_count : key})
                 label_count += 1
         
-        train_data = self.dbutil.get_training_data()
+        train_data = self.dbutil.get_training_data(type)
         for row in train_data:  
             processed_data.append(self.process_data(row))
             
@@ -61,7 +63,7 @@ class classify_service:
 
         train_df, valid_df = train_test_split(
             new_df,
-            test_size=0.2,
+            test_size=0.1,
             random_state=2022
         )
 
@@ -75,8 +77,8 @@ class classify_service:
         label2id = {val: key for key, val in id2label.items()}
         num_labels = len(id2label)
 
-        model = AutoModelForSequenceClassification.from_pretrained(
-            model_checkpoint, num_labels=num_labels, id2label=id2label, label2id=label2id)  
+        model = BertForSequenceClassification.from_pretrained(
+            model_checkpoint, num_labels=num_labels, id2label=id2label, label2id=label2id, ignore_mismatched_sizes=True)  
 
         trainer = Trainer(
             model=model,
@@ -87,30 +89,36 @@ class classify_service:
         )
         trainer.train()
         metrics = trainer.evaluate()
-        print ("Metrics : ", metrics)
+        print("Metrics : " , metrics)
         model.save_pretrained('./model/')
         return model
 
     def predict(self, sentences, model): 
         # model = AutoModelForSequenceClassification.from_pretrained('./model/')
-        classifier = pipeline("text-classification", model=model, tokenizer=self.tokenizer)
-        results = classifier(sentences)
-        return results 
+        classifier = pipeline(classification, model=model, tokenizer=self.tokenizer)
+        print ("sentences : ", sentences)
+        try: 
+            results = classifier(sentences)
+            return results 
+        except TypeError: 
+            print ("Error due to sentences : ", sentences)
+        return None 
 
     def process_contract(self, article_text):
-        model = AutoModelForSequenceClassification.from_pretrained('./model/')
+        model = BertForSequenceClassification.from_pretrained('./model/')
         return_value = {}
         for c_sentence in article_text.split('.'):
             results = self.predict(c_sentence, model)
-            score = (results[0]["score"]  * 100)
-            try: 
-                res = re.search(c_sentence, article_text) # TODO Revisite 
-                if res:
-                    stmt_index = str(res.start()) + "-" + str(res.end())
-                    relevence = score
-                    return_value[stmt_index] = {"start_index" : res.start(), "end_index" : res.end(), "relevence" : relevence}
-            except IndexError:
-                print()
+            if results:
+                score = (results[0]["score"]  * 100)
+                try: 
+                    res = re.search(c_sentence, article_text) # TODO Revisite 
+                    if res:
+                        stmt_index = str(res.start()) + "-" + str(res.end())
+                        relevence = score
+                        return_value[stmt_index] = {"start_index" : res.start(), "end_index" : res.end(), "relevence" : relevence}
+                except IndexError:
+                    print()
 
         return return_value
 
@@ -122,13 +130,17 @@ class classify_service:
             article_text = row["content"]
             for c_sentence in article_text.split('.'):
                 results = self.predict(c_sentence, model)
-                score = (results[0]["score"]  * 100)   
-                label = results[0]["label"]
-                          
-                if score > 9:
-                    print ("Sentences : ", c_sentence)
-                    print ("Result : ", label)
-                    print ("Score : ", score)   
-                    dbutil.save_training_data(c_sentence, label, "generated", "")
+                if results:
+                    score = (results[0]["score"]  * 100)   
+                    label = results[0]["label"]
+                            
+                    if score > 9:
+                        print ("Sentences : ", c_sentence)
+                        print ("Result : ", label)
+                        print ("Score : ", score)   
+                        dbutil.save_training_data(c_sentence, label, "generated", "")
 
         return 
+
+
+

@@ -24,9 +24,9 @@ htmlcov/
 .coverage
 .coverage.*
 *,cover
-result/
-model/
-cuad-models/
-cuad-training/
+result
+model
+cuad-models
+cuad-training
 __pycache__
 app/__pycache__
