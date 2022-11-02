@@ -1,0 +1,13 @@
+torch
+tensorflow
+Flask
+transformers
+gensim
+spacy
+
+datasets
+scipy 
+sklearn
+evaluate
+
+ google-cloud-bigquery

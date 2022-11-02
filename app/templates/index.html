@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>{% block title %} Welcome to Legal Contract Application (LCA) {% endblock %}</h1>
+    <p>Legal Contract Application helps you reduce the Financial/Legal/Compliance Risk from their regular contract/legal document processing, 
+    <br>so that, Businesses/Users can focus their energy on mitigating those risks and profiting from them. </p>
+    <li>Sentence Identification Service </li>
+    <li>Risk Index Score (RIS) Service</li>
+    <li>Liability Analysis Service </li>
+    <li>Domain Improvement Service </li>
+    <br><br>
+    <a href="{{ url_for('training_service') }}">
+        <h4> Training Service </h4>
+    </a>
+    <a href="{{ url_for('test_service') }}">
+        <h4> Classify Service </h4>
+    </a>
+{% endblock %}
