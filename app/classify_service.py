@@ -109,12 +109,14 @@ class classify_service:
             score = (results[0]["score"]  * 100)
             try: 
                 res = re.search(c_sentence, article_text) # TODO Revisite 
-                if res:
+                if not res == None:
                     stmt_index = str(res.start()) + "-" + str(res.end())
                     relevence = score
                     return_value[stmt_index] = {"start_index" : res.start(), "end_index" : res.end(), "relevence" : relevence}
             except IndexError:
-                print()
+                print("IndexError")
+            except re.error:
+                print("re.error")            
 
         return return_value
 
