@@ -39,7 +39,8 @@ class BQUtility:
             bigquery.SchemaField("id", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("created", "TIMESTAMP", mode="NULLABLE"),
             bigquery.SchemaField("keywords", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("statements", "STRING", mode="NULLABLE")
+            bigquery.SchemaField("statements", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("label", "STRING", mode="NULLABLE")
         ]
 
         schema_training_data = [
@@ -48,7 +49,7 @@ class BQUtility:
             bigquery.SchemaField("content", "STRING", mode="NULLABLE"),
             bigquery.SchemaField("label", "STRING", mode="NULLABLE"),
             bigquery.SchemaField("type", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("org_label", "STRING", mode="NULLABLE")
+            bigquery.SchemaField("eval_label", "STRING", mode="NULLABLE")
         ]
 
         try:
@@ -75,6 +76,14 @@ class BQUtility:
         else:
             print('Table %s successfully created.', table3.table_id)
 
+    def db_cleanup(self):
+        self.client.delete_table(self.table_id1, not_found_ok=True)
+        self.client.delete_table(self.table_id2, not_found_ok=True)
+        self.client.delete_table(self.table_id3, not_found_ok=True)
+        self.client.delete_dataset(self.dataset_id, delete_contents=True, not_found_ok=True)
+        print("Deleted dataset '{}'.".format(self.dataset_id))
+
+    # Contracts CRUD 
     def get_contracts(self): 
         uuid_query = "SELECT * from " + self.table_id1
         query_job = self.client.query(uuid_query)  # Make an API request.
@@ -89,7 +98,7 @@ class BQUtility:
 
     def update_contracts_id(self, id, title, content, response): 
         uuid_query = "UPDATE " + self.table_id1 + " SET response = \'" + response + \
-            "/', title = \'" + title + "\', content = \'" + content + "\' where id = \'" + id + "\'"
+            "\', title = \'" + title + "\', content = \'" + content + "\' where id = \'" + id + "\'"
         print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
         #results = "null" #query_job.result()  # Wait for the job to complete. 
@@ -100,13 +109,7 @@ class BQUtility:
         query_job = self.client.query(uuid_query)  # Make an API request.
         #results = query_job.result()  # Wait for the job to complete. 
         return 
-
-    def delete_learndb_id(self, id): 
-        uuid_query = "Delete from " + self.table_id2 + " where id = \'" + id + "\'"
-        query_job = self.client.query(uuid_query)  # Make an API request.
-        #results = query_job.result()  # Wait for the job to complete. 
-        return 
-
+    
     def save_contracts(self, title, content, response): 
         uuid_query = "SELECT GENERATE_UUID() AS uuid;"
         query_job = self.client.query(uuid_query)  # Make an API request.
@@ -127,6 +130,7 @@ class BQUtility:
             print("Encountered errors while inserting rows: {}".format(errors))
         return uuid
 
+    # Learn DB CRUD 
     def get_learndb(self): 
         uuid_query = "SELECT * from " + self.table_id2
         query_job = self.client.query(uuid_query)  # Make an API request.
@@ -139,7 +143,7 @@ class BQUtility:
         results = query_job.result()  # Wait for the job to complete. 
         return results
 
-    def save_learndb(self, keywords, statements):
+    def save_learndb(self, keywords, statements, label):
         uuid_query = "SELECT GENERATE_UUID() AS uuid;"
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
@@ -147,7 +151,7 @@ class BQUtility:
             uuid = row.uuid
 
         rows_to_insert = [
-            {"id": uuid, "keywords" : keywords, "statements" : statements, "created" : "2022-01-01 01:01"}
+            {"id": uuid, "keywords" : keywords, "statements" : statements, "created" : "2022-01-01 01:01", "label" : label}
             ]
 
         errors = self.client.insert_rows_json(
@@ -160,7 +164,14 @@ class BQUtility:
         
         return uuid
 
-    def save_training_data(self, content, label, type, org_label): 
+    def delete_learndb_id(self, id): 
+        uuid_query = "Delete from " + self.table_id2 + " where id = \'" + id + "\'"
+        query_job = self.client.query(uuid_query)  # Make an API request.
+        #results = query_job.result()  # Wait for the job to complete. 
+        return   
+
+    # Training Data CRUD 
+    def save_training_data(self, content, label, type, eval_label): 
         uuid_query = "SELECT GENERATE_UUID() AS uuid;"
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
@@ -168,7 +179,7 @@ class BQUtility:
             uuid = row.uuid
 
         rows_to_insert = [
-            {"id": uuid, "content" : content, "created" : "2022-01-01 01:01", "label" : label, "type" : type, "org_label" : org_label}
+            {"id": uuid, "content" : content, "created" : "2022-01-01 01:01", "label" : label, "type" : type, "eval_label" : eval_label}
             ]
 
         errors = self.client.insert_rows_json(
@@ -183,18 +194,21 @@ class BQUtility:
     def get_training_data(self, type="all"): 
         uuid_query = "SELECT * from " + self.table_id3 
         if not type == "all":
-            uuid_query = "SELECT * from " + self.table_id3 + " where type=/'" + type + "/'"
+            uuid_query = "SELECT * from " + self.table_id3 + " where type=\'" + type + "\'"
+        print(uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
         return results
 
-    def db_cleanup(self):
-        self.client.delete_table(self.table_id1, not_found_ok=True)
-        self.client.delete_table(self.table_id2, not_found_ok=True)
-        self.client.delete_table(self.table_id3, not_found_ok=True)
-        self.client.delete_dataset(self.dataset_id, delete_contents=True, not_found_ok=True)
-        print("Deleted dataset '{}'.".format(self.dataset_id))
+    def update_training_data(self, id, eval_label): 
+        uuid_query = "UPDATE " + self.table_id3 + " SET eval_label = \'" + eval_label + "\'" + " where id = \'" + id + "\'"
+        print (uuid_query)
+        query_job = self.client.query(uuid_query)  # Make an API request.
+        #print (query_job)
+        #results = "null" #query_job.result()  # Wait for the job to complete. 
+        return 
 
-    def generated_cleanup(self):
-        delete_sql = "Delete from " + self.table_id3 + " where type=\'generated\'"
+    def training_data_cleanup(self, type):
+        delete_sql = "Delete from " + self.table_id3 + " where type=\'" + type + "\'"
         query_job = self.client.query(delete_sql)
+

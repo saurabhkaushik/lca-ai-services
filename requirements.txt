@@ -9,5 +9,4 @@ datasets
 scipy 
 sklearn
 evaluate
-
- google-cloud-bigquery
+google-cloud-bigquery

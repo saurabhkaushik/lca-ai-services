@@ -1,4 +1,5 @@
-amortised cost of a financial asset or financial liability
+amortised cost of a financial asset 
+financial liability
 available-for-sale financial assets
 derecognition
 derivative
@@ -39,10 +40,7 @@ Warranty Liability
 Contingent Liability Evaluation
 Deferred Credits
 Post-Employment Benefits
-Unamortized Investment Tax Credits (UITC)
-Debt Ratio
-Debt to equity ratio
-Capitalization ratio
+Unamortized Investment Tax Credits
 Cash flow to total debt ratio
 Interest coverage ratio
 Current Ratios and Quick Ratios
@@ -59,7 +57,6 @@ Long term notes payable
 deferred tax liabilities
 mortgage payable
 Capital lease
-Losses
 Guarantees
 Pension
 Severance costs
@@ -79,4 +76,3 @@ Bonds Payable
 Notes Payable 
 Pension Benefit Obligations
 Product Warranties 
-Deferred Tax Liabilities (DTLs)

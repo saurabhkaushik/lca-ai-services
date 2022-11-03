@@ -10,6 +10,10 @@ from sklearn import preprocessing
 from transformers import TrainingArguments, Trainer
 import re
 from app.BQUtility import BQUtility
+import evaluate
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
 
 from app.highlight_service import highlight_service
 
@@ -121,14 +125,55 @@ class classify_service:
         for row in results:
             article_text = row["content"]
             for c_sentence in article_text.split('.'):
-                results = self.predict(c_sentence, model)
-                score = (results[0]["score"]  * 100)   
-                label = results[0]["label"]
-                          
-                if score > 9:
-                    print ("Sentences : ", c_sentence)
-                    print ("Result : ", label)
-                    print ("Score : ", score)   
-                    dbutil.save_training_data(c_sentence, label, "generated", "")
+                try: 
+                    results = self.predict(c_sentence, model)
+                except RuntimeError:
+                    print ("Tensor size issues.")
+                else: 
+                    score = (results[0]["score"]  * 100)   
+                    label = results[0]["label"]
+                    print ("Sentences : ", c_sentence, "Result : ", label, "Score : ", score) 
+                    if score > 7:
+                        print("Saved")                      
+                        dbutil.save_training_data(c_sentence, label, "generated", "")
+        return 
+    
+    def evaluate_contract_training_data(self):
+        model = AutoModelForSequenceClassification.from_pretrained('./model/')
+        dbutil = BQUtility()
+        results = self.dbutil.get_training_data()
+        for row in results:
+            article_text = row["content"]
+            results = self.predict(article_text, model)
+            score = (results[0]["score"]  * 100) 
+            label = results[0]["label"] 
+            dbutil.update_training_data(row['id'], label)
 
         return 
+
+    def evalute_results(self):
+        ref = []
+        pred = []
+
+        results = self.dbutil.get_training_data()
+        for row in results:
+            ref.append(row["label"])
+            pred.append(row["eval_label"])
+            
+        report = classification_report(ref, pred)
+        print ("Classification Report : \n", report)
+        matrix = confusion_matrix(ref, pred)
+        print("Confusion Matrix: \n", matrix)
+        accry_score = accuracy_score(ref, pred)
+        print("Accuracy Score: \n", accry_score*100, "%")
+
+'''
+        accuracy = evaluate.load("accuracy")
+        accuracy.add(references= ref, predictions=pred)
+        acc_result = accuracy.compute()
+        print ("Accuracy : ", acc_result)
+
+        clf_metrics = evaluate.combine(["accuracy", "f1", "precision", "recall"])
+        clf_results = clf_metrics.compute(references= ref, predictions=pred)
+        print ("CLF Results : ", clf_results)
+'''
