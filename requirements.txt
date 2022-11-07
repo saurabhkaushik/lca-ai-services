@@ -4,7 +4,7 @@ Flask
 transformers
 gensim
 spacy
-
+PyTextRank
 datasets
 scipy 
 sklearn

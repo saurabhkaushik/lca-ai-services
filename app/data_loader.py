@@ -29,7 +29,7 @@ class data_loader:
             for row in seedreader:
                 if line_count >0:
                     print(row[1].rstrip() + ", " + row[0].rstrip())
-                    self.dbutil.save_learndb("", row[1].rstrip(), row[0].rstrip())
+                    self.dbutil.save_seed_data("", row[1].rstrip(), row[0].rstrip())
                 line_count += 1
         csvfile.close()
 

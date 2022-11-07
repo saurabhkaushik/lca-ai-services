@@ -4,7 +4,6 @@ from werkzeug.exceptions import abort
 from flask import make_response, jsonify
 
 from app.classify_service import classify_service as Classify_Service
-from app.DBUtility import DBUtility
 from app.BQUtility import BQUtility
 from app.highlight_service import highlight_service
 

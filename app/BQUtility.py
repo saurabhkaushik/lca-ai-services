@@ -6,8 +6,8 @@ class BQUtility:
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = './store/genuine-wording-key.json'
     project_id = "genuine-wording-362504"
     dataset_id = "{}.lca_db".format(project_id)
-    table_id1 = "genuine-wording-362504.lca_db.contracts"
-    table_id2 = "genuine-wording-362504.lca_db.learndb"
+    table_id1 = "genuine-wording-362504.lca_db.contract_data"
+    table_id2 = "genuine-wording-362504.lca_db.seed_data"
     table_id3 = "genuine-wording-362504.lca_db.training_data"
 
     client = bigquery.Client(project=project_id)
@@ -26,7 +26,7 @@ class BQUtility:
         else:
             print('Dataset %s successfully created.', dataset.dataset_id)
 
-        schema_contracts = [
+        schema_contract_data = [
             bigquery.SchemaField("id", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("created", "TIMESTAMP", mode="REQUIRED"),
             bigquery.SchemaField("title", "STRING", mode="NULLABLE"),
@@ -35,11 +35,11 @@ class BQUtility:
             bigquery.SchemaField("userid", "STRING", mode="NULLABLE")
         ]
 
-        schema_learndb = [
+        schema_seed_data = [
             bigquery.SchemaField("id", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("created", "TIMESTAMP", mode="NULLABLE"),
             bigquery.SchemaField("keywords", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("statements", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("content", "STRING", mode="NULLABLE"),
             bigquery.SchemaField("label", "STRING", mode="NULLABLE")
         ]
 
@@ -53,7 +53,7 @@ class BQUtility:
         ]
 
         try:
-            table1 = bigquery.Table(self.table_id1, schema=schema_contracts)
+            table1 = bigquery.Table(self.table_id1, schema=schema_contract_data)
             table1 = self.client.create_table(table1)  
         except Conflict: 
             print('Table %s already exists, not creating.', table1.table_id)
@@ -61,7 +61,7 @@ class BQUtility:
             print('Table %s successfully created.', table1.table_id)
 
         try: 
-            table2 = bigquery.Table(self.table_id2, schema=schema_learndb)
+            table2 = bigquery.Table(self.table_id2, schema=schema_seed_data)
             table2 = self.client.create_table(table2)  # Make an API request.
         except Conflict: 
             print('Table %s already exists, not creating.', table2.table_id)
@@ -77,21 +77,25 @@ class BQUtility:
             print('Table %s successfully created.', table3.table_id)
 
     def db_cleanup(self):
-        self.client.delete_table(self.table_id1, not_found_ok=True)
+        #self.client.delete_table(self.table_id1, not_found_ok=True)
         self.client.delete_table(self.table_id2, not_found_ok=True)
         self.client.delete_table(self.table_id3, not_found_ok=True)
-        self.client.delete_dataset(self.dataset_id, delete_contents=True, not_found_ok=True)
+        #self.client.delete_dataset(self.dataset_id, delete_contents=True, not_found_ok=True)
         print("Deleted dataset '{}'.".format(self.dataset_id))
 
     # Contracts CRUD 
-    def get_contracts(self): 
+    def get_contracts(self, page="true"): 
         uuid_query = "SELECT * from " + self.table_id1
+        if page == "true":
+            uuid_query += " Limit " + str(50)
+        print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
         return results
 
     def get_contracts_id(self, id): 
         uuid_query = "SELECT * from " + self.table_id1 + " where id = \'" + id + "\'"
+        print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
         return results
@@ -101,17 +105,17 @@ class BQUtility:
             "\', title = \'" + title + "\', content = \'" + content + "\' where id = \'" + id + "\'"
         print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
-        #results = "null" #query_job.result()  # Wait for the job to complete. 
         return 
 
     def delete_contracts_id(self, id): 
         uuid_query = "Delete from " + self.table_id1 + " where id = \'" + id + "\'"
+        print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
-        #results = query_job.result()  # Wait for the job to complete. 
         return 
     
     def save_contracts(self, title, content, response): 
         uuid_query = "SELECT GENERATE_UUID() AS uuid;"
+        print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
         for row in results:
@@ -131,27 +135,30 @@ class BQUtility:
         return uuid
 
     # Learn DB CRUD 
-    def get_learndb(self): 
+    def get_seed_data(self): 
         uuid_query = "SELECT * from " + self.table_id2
+        print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
         return results
 
-    def get_learndb_id(self, id): 
+    def get_seed_data_id(self, id): 
         uuid_query = "SELECT * from " + self.table_id2 + " where id = \'" + id + "\'"
+        print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
         return results
 
-    def save_learndb(self, keywords, statements, label):
+    def save_seed_data(self, keywords, content, label):
         uuid_query = "SELECT GENERATE_UUID() AS uuid;"
+        print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
         for row in results:
             uuid = row.uuid
 
         rows_to_insert = [
-            {"id": uuid, "keywords" : keywords, "statements" : statements, "created" : "2022-01-01 01:01", "label" : label}
+            {"id": uuid, "keywords" : keywords, "content" : content, "created" : "2022-01-01 01:01", "label" : label}
             ]
 
         errors = self.client.insert_rows_json(
@@ -164,8 +171,16 @@ class BQUtility:
         
         return uuid
 
-    def delete_learndb_id(self, id): 
+    def update_seed_data_id(self, id, keywords, content, label): 
+        uuid_query = "UPDATE " + self.table_id2 + " SET keywords = \'" + keywords + \
+            "\', content = \'" + content + "\', label = \'" + label + "\' where id = \'" + id + "\'"
+        print (uuid_query)
+        query_job = self.client.query(uuid_query)  # Make an API request.
+        return 
+
+    def delete_seed_data_id(self, id): 
         uuid_query = "Delete from " + self.table_id2 + " where id = \'" + id + "\'"
+        print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
         #results = query_job.result()  # Wait for the job to complete. 
         return   
@@ -173,6 +188,7 @@ class BQUtility:
     # Training Data CRUD 
     def save_training_data(self, content, label, type, eval_label): 
         uuid_query = "SELECT GENERATE_UUID() AS uuid;"
+        print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
         for row in results:
@@ -204,11 +220,10 @@ class BQUtility:
         uuid_query = "UPDATE " + self.table_id3 + " SET eval_label = \'" + eval_label + "\'" + " where id = \'" + id + "\'"
         print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
-        #print (query_job)
-        #results = "null" #query_job.result()  # Wait for the job to complete. 
         return 
 
     def training_data_cleanup(self, type):
         delete_sql = "Delete from " + self.table_id3 + " where type=\'" + type + "\'"
+        print (delete_sql)
         query_job = self.client.query(delete_sql)
 

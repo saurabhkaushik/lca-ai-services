@@ -135,7 +135,7 @@ class classify_service:
                     score = (results[0]["score"]  * 100)   
                     label = results[0]["label"]
                     print ("Sentences : ", c_sentence, "Result : ", label, "Score : ", score) 
-                    if score > 7:
+                    if score > 40:
                         print("Saved")                      
                         dbutil.save_training_data(c_sentence, label, "generated", "")
         return 
