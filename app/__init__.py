@@ -15,7 +15,6 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
 
     class_service = Classify_Service()
     dbutil = BQUtility() 
-    #dbutil = DBUtility() 
     high_service = highlight_service()   
     dbutil.create_database() 
 

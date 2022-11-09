@@ -21,15 +21,14 @@ class data_loader:
             self.dbutil.save_contracts(title, contract, "")
         return 
 
-    def import_seed_data(self):
-        
+    def import_seed_data(self):        
         with open(self.seed_data_file, newline='', encoding='utf-8') as csvfile:
             seedreader = csv.reader(csvfile)
             line_count = 0
             for row in seedreader:
-                if line_count >0:
-                    print(row[1].rstrip() + ", " + row[0].rstrip())
-                    self.dbutil.save_seed_data("", row[1].rstrip(), row[0].rstrip())
+                if line_count > 0:
+                    #print("Statements : ", row[1].rstrip() + ", Label :" + row[0].rstrip())
+                    self.dbutil.save_seed_data("", row[0].rstrip(), row[1].rstrip())
                 line_count += 1
         csvfile.close()
 

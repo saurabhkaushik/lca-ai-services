@@ -18,7 +18,7 @@ class highlight_service:
                 for stmt in t_sentence: 
                     if len(stmt) > 2:   
                         #print ("Length of Stmt: ", len(stmt))                 
-                        catch_stmt = {"sentence" : stmt, "label" : label}
+                        catch_stmt = {"sentence" : stmt, "label" : label.lower().strip()}
                         print (">>>>>>> Catch Stmt: ", catch_stmt)
                         dbutil.save_training_data(catch_stmt["sentence"], catch_stmt["label"], "seed", "")
         return
