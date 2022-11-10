@@ -10,6 +10,7 @@ from joblib import dump, load
 from sklearn.pipeline import Pipeline
 import numpy as np
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import re
 
 # load the dataset
 labels, texts = [], []
@@ -59,7 +60,6 @@ class Keyword_Classifier:
         labels, texts = [], []
         texts.append(text)
         predictDF['text'] = texts
-        #print ("Input Value : ", predictDF['text'])
         predicted = self.text_clf.predict(predictDF['text'])
         predicted_prob = self.text_clf.predict_proba(predictDF['text'])
         
@@ -67,19 +67,24 @@ class Keyword_Classifier:
 
     def complete_processing(self):
         self.prepare_training_data()
+        #text_clf = load('./model/keyword/keyword_class.joblib')
         
         dbutil = BQUtility()
         results = dbutil.get_contracts(page="true")
         for row in results:
             article_text = row["content"]
-            for c_sentence in article_text.split('.'): 
-                #print("Input Text : ", c_sentence)   
-                predict_label, predict_prb = self.predict_text_data(c_sentence) 
-                #print("Predicted Value : ", predict_label, predict_prb)
-                score = predict_prb * 100  
-                label = predict_label
-                if score > 80:
-                    print ("Sentences : ", c_sentence, ", Result : ", label.lower().strip(), ", Score : ", score) 
-                    dbutil.save_training_data(c_sentence, label.lower().strip(), "generated", "")
+            print("Filename:", row["title"])  
+            sentences = re.split(r' *[\.\?!][\'"\)\]]* *', article_text)             
+            for c_sentence in sentences: 
+                c_sentence = c_sentence.strip() + "."
+                if len(c_sentence) > 4:                     
+                    predict_label, predict_prb = self.predict_text_data(c_sentence) 
+                    #print("Predicted Value : ", c_sentence, predict_label, predict_prb)
+                    score = predict_prb * 100  
+                    label = predict_label
+
+                    if score > 75:
+                        print ("Sentences : ", c_sentence, ", Result : ", label.lower().strip(), ", Score : ", score) 
+                        dbutil.save_training_data(c_sentence, label.lower().strip(), "generated", "")
         return 
 

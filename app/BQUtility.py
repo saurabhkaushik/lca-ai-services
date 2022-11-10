@@ -1,6 +1,7 @@
 from google.cloud import bigquery
 from google.cloud.exceptions import NotFound, Conflict
 import os
+from google.api_core.exceptions import BadRequest
 
 class BQUtility:
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = './store/genuine-wording-key.json'
@@ -81,6 +82,7 @@ class BQUtility:
         self.client.delete_table(self.table_id2, not_found_ok=True)
         self.client.delete_table(self.table_id3, not_found_ok=True)
         #self.client.delete_dataset(self.dataset_id, delete_contents=True, not_found_ok=True)
+        self.client.delete_table(self.table_id4, not_found_ok=True)
         print("Deleted dataset '{}'.".format(self.dataset_id))
 
     # Contracts CRUD 
@@ -130,7 +132,7 @@ class BQUtility:
             self.table_id1, rows_to_insert, row_ids=[None] * len(rows_to_insert)
         )  # Make an API request.
         if errors == []:
-            print("New rows have been added.")
+            print("New rows have been added.", self.table_id1)
         else:
             print("Encountered errors while inserting rows: {}".format(errors))
         return uuid
@@ -165,7 +167,7 @@ class BQUtility:
             self.table_id2, rows_to_insert, row_ids=[None] * len(rows_to_insert)
         )  # Make an API request.
         if errors == []:
-            print("New rows have been added.")
+            print("New rows have been added.", self.table_id2)
         else:
             print("Encountered errors while inserting rows: {}".format(errors))
         
@@ -175,8 +177,17 @@ class BQUtility:
         uuid_query = "UPDATE " + self.table_id2 + " SET keywords = \'" + keywords + \
             "\', content = \'" + content + "\', label = \'" + label + "\' where id = \'" + id + "\'"
         print (uuid_query)
-        query_job = self.client.query(uuid_query)  # Make an API request.
+        query_job = self.client.query(uuid_query)  
         results = query_job.result()
+        ''' 
+        while True:
+            try:
+                results = query_job.result()
+            except BadRequest as e: 
+                print('ERROR: {}'.format(str(e)))
+            else: 
+                break
+        '''
         return results
 
     def delete_seed_data_id(self, id): 
@@ -203,7 +214,7 @@ class BQUtility:
             self.table_id3, rows_to_insert, row_ids=[None] * len(rows_to_insert)
         )  
         if errors == []:
-            print("New rows have been added.")
+            print("New rows have been added.", self.table_id3)
         else:
             print("Encountered errors while inserting rows: {}".format(errors))
         return uuid
@@ -230,4 +241,3 @@ class BQUtility:
         query_job = self.client.query(delete_sql)
         query_job.result()
         return
-

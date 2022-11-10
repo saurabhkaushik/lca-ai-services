@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, url_for, flash, redirect
 from werkzeug.exceptions import abort   
 from flask import make_response, jsonify
 
-from app.classify_service import classify_service as Classify_Service
+from app.Transformer_Classifier import Transformer_Classifier 
 from app.BQUtility import BQUtility
 from app.highlight_service import highlight_service
 
@@ -13,7 +13,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     apps.debug = debug
     apps.testing = testing
 
-    class_service = Classify_Service()
+    class_service = Transformer_Classifier()
     dbutil = BQUtility() 
     high_service = highlight_service()   
     dbutil.create_database() 

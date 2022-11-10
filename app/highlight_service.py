@@ -1,27 +1,11 @@
-from gensim.models import Word2Vec
+#from gensim.models import Word2Vec
 from app.BQUtility import BQUtility
+import re 
 
 class highlight_service:
 
     def __init__(self) -> None:
         pass
-    
-    def seed_training_load(self):
-        dbutil = BQUtility()    
-        
-        results = dbutil.get_seed_data()
-        for row in results: 
-            content = row['content']   
-            label = row['label']            
-            if len(content) > 0: 
-                t_sentence = [sentence + '.' for sentence in content.split('.')]
-                for stmt in t_sentence: 
-                    if len(stmt) > 2:   
-                        #print ("Length of Stmt: ", len(stmt))                 
-                        catch_stmt = {"sentence" : stmt, "label" : label.lower().strip()}
-                        print (">>>>>>> Catch Stmt: ", catch_stmt)
-                        dbutil.save_training_data(catch_stmt["sentence"], catch_stmt["label"], "seed", "")
-        return
 
     def highlight_ranking(self, return_value):
         for r_key in return_value:

@@ -3,6 +3,7 @@ import pandas as pd
 import spacy 
 from app.BQUtility import BQUtility
 from app.PreProcessText import PreProcessText
+import re
 
 nlp = spacy.load("en_core_web_sm")
 nlp.add_pipe("textrank")
@@ -20,7 +21,7 @@ class TextRank_Extractor:
             str_key = str_process.token_words(text=phrase.text)
             stringkeyword = " ".join(str_key)
             if len(stringkeyword) > 0:
-                keyword.append(stringkeyword.lower())
+                keyword.append(stringkeyword.lower().strip())
         res = sorted(set(keyword), key = lambda x: keyword.count(x), reverse=True)
         return res
 
@@ -32,9 +33,9 @@ class TextRank_Extractor:
             content = row['content'] 
             id = row['id']
             label = row['label']
-            if len(content) > 0: 
-                t_sentence = [sentence + '.' for sentence in content.split('.')]
-                for stmt in t_sentence: 
+            if len(content) > 1: 
+                sentences = re.split(r' *[\.\?!][\'"\)\]]* *', content)
+                for stmt in sentences: 
                     if len(stmt) > 0:   
                         keywords =  self.text_rank(stmt) 
                         keywords = ", ".join(keywords)                 
