@@ -3,11 +3,9 @@ import pandas as pd
 import spacy 
 from app.BQUtility import BQUtility
 from app.PreProcessText import PreProcessText
-import re
 
 nlp = spacy.load("en_core_web_sm")
 nlp.add_pipe("textrank")
-
 str_process = PreProcessText()
 
 class TextRank_Extractor: 
@@ -34,9 +32,10 @@ class TextRank_Extractor:
             id = row['id']
             label = row['label']
             if len(content) > 1: 
-                sentences = re.split(r' *[\.\?!][\'"\)\]]* *', content)
+                sentences = str_process.get_sentences(content)
                 for stmt in sentences: 
+                    stmt = str(stmt)
                     if len(stmt) > 0:   
-                        keywords =  self.text_rank(stmt) 
+                        keywords =  self.text_rank(stmt)
                         keywords = ", ".join(keywords)                 
                         dbutil.update_seed_data_id(id, keywords, content, label)

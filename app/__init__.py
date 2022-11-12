@@ -5,7 +5,11 @@ from flask import make_response, jsonify
 
 from app.Transformer_Classifier import Transformer_Classifier 
 from app.BQUtility import BQUtility
-from app.highlight_service import highlight_service
+from app.Risk_Score_Service import Risk_Score_Service
+
+score_service = Risk_Score_Service()   
+class_service = Transformer_Classifier()
+dbutil = BQUtility() 
 
 def create_app(config, debug=False, testing=False, config_overrides=None):
     apps = Flask(__name__)
@@ -13,9 +17,6 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     apps.debug = debug
     apps.testing = testing
 
-    class_service = Transformer_Classifier()
-    dbutil = BQUtility() 
-    high_service = highlight_service()   
     dbutil.create_database() 
 
     if config_overrides:
@@ -41,7 +42,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
             flash('contract is required!')
             return
         answer_results = class_service.process_contract(contract)
-        answer_results = high_service.highlight_ranking(answer_results)
+        answer_results = score_service.highlight_ranking(answer_results)
         print("Contract Analysis : ", answer_results)
         return jsonify(answer_results)
 
@@ -55,7 +56,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     def test_service():  
         contract = "This is a very legalised way of doing businesss."
         answer_results = class_service.process_contract(contract)
-        answer_results = high_service.highlight_ranking(answer_results)
+        answer_results = score_service.highlight_ranking(answer_results)
         print("Contract Analysis : ", answer_results)
         return jsonify(answer_results)
 

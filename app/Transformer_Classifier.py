@@ -1,5 +1,4 @@
 from transformers import AutoModelForSequenceClassification
-import json 
 from transformers import AutoTokenizer
 from transformers import pipeline
 from sklearn.model_selection import train_test_split
@@ -10,19 +9,15 @@ from sklearn import preprocessing
 from transformers import TrainingArguments, Trainer
 import re
 from app.BQUtility import BQUtility
-import evaluate
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from app.PreProcessText import PreProcessText
 
-from app.highlight_service import highlight_service
-
+processTxt = PreProcessText()
 model_checkpoint = "distilbert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
+dbutil = BQUtility()
 
 class Transformer_Classifier:
-
-    tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
-    high_service = highlight_service()
-    dbutil = BQUtility()
-
     label_y = dict()
     label_x = dict()
 
@@ -34,7 +29,7 @@ class Transformer_Classifier:
         text = str(text)
         text = ' '.join(text.split())
 
-        encodings = self.tokenizer(text, padding="max_length", truncation=True, max_length=128)
+        encodings = tokenizer(text, padding="max_length", truncation=True, max_length=128)
 
         label = self.label_y[row['label'].lower().strip()]
 
@@ -85,7 +80,7 @@ class Transformer_Classifier:
             args=training_args,
             train_dataset=train_hg,
             eval_dataset=valid_hg,
-            tokenizer=self.tokenizer
+            tokenizer=tokenizer
         )
         trainer.train()
         metrics = trainer.evaluate()
@@ -93,18 +88,19 @@ class Transformer_Classifier:
         model.save_pretrained('./model/')
         return model
 
-    def predict(self, sentences, model): 
-        # model = AutoModelForSequenceClassification.from_pretrained('./model/')
+    def predict(self, sentences): 
+        model = AutoModelForSequenceClassification.from_pretrained('./model/')
         classifier = pipeline("text-classification", model=model, tokenizer=self.tokenizer)
         results = classifier(sentences)
         return results 
 
     def process_contract(self, article_text):
-        model = AutoModelForSequenceClassification.from_pretrained('./model/')
         return_value = {}
-        for c_sentence in article_text.split('.'):
+        sentences = processTxt.get_sentences(article_text)
+        for c_sentence in sentences:
+            c_sentence = str(c_sentence)
             if len(c_sentence) > 0 and len(c_sentence) < 512:
-                results = self.predict(c_sentence, model)
+                results = self.predict(c_sentence)
                 score = (results[0]["score"]  * 100)
                 try: 
                     res = re.search(c_sentence, article_text) # TODO Revisite 
@@ -120,15 +116,15 @@ class Transformer_Classifier:
         return return_value
 
     def contract_training_data(self):
-        model = AutoModelForSequenceClassification.from_pretrained('./model/')
-        dbutil = BQUtility()
         results = dbutil.get_contracts()
         for row in results:
             article_text = row["content"]
-            for c_sentence in article_text.split('.'):
+            sentences = processTxt.get_sentences(article_text)
+            for c_sentence in sentences:
+                c_sentence = str(c_sentence)
                 if len(c_sentence) > 0 and len(c_sentence) < 512:
                     try: 
-                        results = self.predict(c_sentence, model)
+                        results = self.predict(c_sentence)
                     except RuntimeError:
                         print ("Tensor size issues.")
                     else: 
@@ -140,19 +136,14 @@ class Transformer_Classifier:
         return 
     
     def evaluate_contract_training_data(self):
-        model = AutoModelForSequenceClassification.from_pretrained('./model/')
-        dbutil = BQUtility()
-        #dbutil.delete_evaluation_data()
         results = self.dbutil.get_training_data()
         for row in results:
             article_text = row["content"]
             if len(article_text) > 0 and len(article_text) < 512:
-                results = self.predict(article_text, model)
+                results = self.predict(article_text)
                 score = (results[0]["score"]  * 100) 
                 label = results[0]["label"] 
                 dbutil.update_training_data(row['id'], label)
-                #dbutil.save_evaluation_data(row['id'], label, score)
-
         return 
 
     def evalute_results(self):
@@ -161,14 +152,8 @@ class Transformer_Classifier:
         
         results = self.dbutil.get_training_data()        
         for row in results:
-            #results2 = self.dbutil.get_evaluation_data()
             ref.append(row["label"].lower().strip())
             pred.append(row["eval_label"].lower().strip())
-            '''
-            for row2 in results2:              
-                if row2['id'] == row['id']: 
-                    pred.append(row2["eval_label"].lower().strip())
-            '''
         #print ("Ref: ", ref)
         #print ("Pred", pred)
         report = classification_report(ref, pred)

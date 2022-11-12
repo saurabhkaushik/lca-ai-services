@@ -1,19 +1,15 @@
-from sklearn import preprocessing
 import pandas as pd
-import sklearn.model_selection as model_selection
 from sklearn import naive_bayes
-from sklearn.feature_extraction.text import TfidfVectorizer, TfidfTransformer, CountVectorizer
-from sklearn import metrics
-
+from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
 from app.BQUtility import BQUtility
+from app.PreProcessText import PreProcessText
 from joblib import dump, load 
 from sklearn.pipeline import Pipeline
-import numpy as np
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-import re
 
 # load the dataset
 labels, texts = [], []
+processTxt = PreProcessText()
 
 class Keyword_Classifier:
     def __init__(self) -> None:
@@ -36,12 +32,16 @@ class Keyword_Classifier:
         self.trainDF['text'] = texts
         self.trainDF['label'] = labels
 
+    def train_model(self):
         self.text_clf = Pipeline([('vect', CountVectorizer(stop_words='english')),
                       ('tfidf', TfidfTransformer()),
                       ('clf', naive_bayes.MultinomialNB())])
         self.text_clf = self.text_clf.fit(self.trainDF['text'], self.trainDF['label'])
 
-        # Evaluate Performance 
+        dump(self.text_clf, './model/keyword/keyword_class.joblib')
+        return 
+
+    def evaluate_model(self):
         predicted = self.text_clf.predict(self.trainDF['text'])
 
         y_labels = self.trainDF['label'].to_numpy()
@@ -52,12 +52,10 @@ class Keyword_Classifier:
         acc_score = accuracy_score(y_labels, predicted)
         print("Accuracy Score: \n", acc_score*100, "%")
 
-        dump(self.text_clf, './model/keyword/keyword_class.joblib')
-        return 
-
     def predict_text_data(self, text):
+        self.text_clf = load('./model/keyword/keyword_class.joblib')
         predictDF = pd.DataFrame()
-        labels, texts = [], []
+        texts = []
         texts.append(text)
         predictDF['text'] = texts
         predicted = self.text_clf.predict(predictDF['text'])
@@ -65,21 +63,18 @@ class Keyword_Classifier:
         
         return predicted[0], max(predicted_prob[0])
 
-    def complete_processing(self):
-        self.prepare_training_data()
-        #text_clf = load('./model/keyword/keyword_class.joblib')
-        
+    def process_contract_data(self):       
         dbutil = BQUtility()
         results = dbutil.get_contracts(page="true")
         for row in results:
             article_text = row["content"]
             print("Filename:", row["title"])  
-            sentences = re.split(r' *[\.\?!][\'"\)\]]* *', article_text)             
+            sentences = processTxt.get_sentences(article_text)
+            #sentences = re.split(r' *[\.\?!][\'"\)\]]* *', article_text)             
             for c_sentence in sentences: 
-                c_sentence = c_sentence.strip() + "."
+                c_sentence = str(c_sentence)
                 if len(c_sentence) > 4:                     
                     predict_label, predict_prb = self.predict_text_data(c_sentence) 
-                    #print("Predicted Value : ", c_sentence, predict_label, predict_prb)
                     score = predict_prb * 100  
                     label = predict_label
 

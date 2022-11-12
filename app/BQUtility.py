@@ -82,7 +82,6 @@ class BQUtility:
         self.client.delete_table(self.table_id2, not_found_ok=True)
         self.client.delete_table(self.table_id3, not_found_ok=True)
         #self.client.delete_dataset(self.dataset_id, delete_contents=True, not_found_ok=True)
-        self.client.delete_table(self.table_id4, not_found_ok=True)
         print("Deleted dataset '{}'.".format(self.dataset_id))
 
     # Contracts CRUD 
@@ -179,15 +178,6 @@ class BQUtility:
         print (uuid_query)
         query_job = self.client.query(uuid_query)  
         results = query_job.result()
-        ''' 
-        while True:
-            try:
-                results = query_job.result()
-            except BadRequest as e: 
-                print('ERROR: {}'.format(str(e)))
-            else: 
-                break
-        '''
         return results
 
     def delete_seed_data_id(self, id): 
@@ -195,7 +185,6 @@ class BQUtility:
         print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()
-        #results = query_job.result()  # Wait for the job to complete. 
         return results 
 
     # Training Data CRUD 
