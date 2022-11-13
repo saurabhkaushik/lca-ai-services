@@ -5,8 +5,6 @@ from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
 nlp = spacy.load('en_core_web_sm')
 dbutil = BQUtility()
-from transformers import pipeline
-sentiment_pipeline = pipeline("sentiment-analysis")
 
 class Risk_Score_Service:
 
@@ -26,20 +24,19 @@ class Risk_Score_Service:
                         return_value[r_key]["relevence_degree"] = "LOW"
         return return_value
     
-    def adjust_score(self, sent_score, score):
-        print (sent_score, score)
-        adj_score = score + ((sent_score * score) / 200)
+    def adjust_score(self, count, total, score):
+        adj_score = score + (((count * 100) / total) * score)
         return adj_score
 
-    def calculate_score(self, sentence, score):
+    def calculate_score(self, sentence, score, keywords):
         neg_score = 0
         doc = nlp(str(sentence))
-        data = [sentence] 
-        sentr = sentiment_pipeline(data)
-        #print(sentr)
-        sent_score = (sentr[0]['score']) if sentr[0]['label'] == 'POSITIVE' else -(sentr[0]['score'])
-        sent_score = sent_score * 100.00
-        adj_score = self.adjust_score(sent_score, score)
+        for e in doc.ents:
+            print(e.text, e._.negex)
+            etxt =  lemmatizer.lemmatize(e.text)
+            if etxt in keywords:
+                neg_score = (neg_score - 1) if e._.negex == True else (neg_score + 1)
+        adj_score = self.adjust_score(neg_score, len(sentence), score)
         return adj_score
 
     def get_keywords(self):

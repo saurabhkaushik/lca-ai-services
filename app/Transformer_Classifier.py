@@ -115,7 +115,7 @@ class Transformer_Classifier:
 
         return return_value
 
-    def contract_training_data(self):
+    def process_contract_training_data(self):
         results = dbutil.get_contracts()
         for row in results:
             article_text = row["content"]
