@@ -6,33 +6,31 @@ import os
 from app.PreProcessText import PreProcessText
 processTxt = PreProcessText()
 dbutil = BQUtility()
-cuda_data_file = './cuad-data/CUADv1.json'
-keywords_data_file = './cuad-data/keywords.txt'
-statements_data_file = './cuad-data/statements.txt'
-seed_data_file = './cuad-data/seed_data.csv'
+cuda_data_file = './cuad-data/CUAD/CUADv1.json'
 reports_folder = './cuad-data/reports/'
+seed_data_file = './cuad-data/seed_data.csv'
 
 class Data_Loader: 
     def __init__(self) -> None:
         pass
 
-    def import_contract_data(self):
+    def import_cuad_contract_data(self):
         with open(self.cuda_data_file) as json_file:
             data = json.load(json_file)
         for data_row in data['data']:
             contract = data_row['paragraphs'][0]['context']
             title = data_row['title']
-            self.dbutil.save_contracts(title, contract, "")
+            dbutil.save_contracts(title.rstrip(), contract.rstrip())
         return 
 
-    def import_reports_data(self):    
+    def import_reports_contract_data(self):    
         filelist = os.listdir(self.reports_folder)   
         for file_name in filelist:  
             if file_name.endswith(".txt"):
                 print("Working with ", file_name)
                 with open(self.reports_folder + file_name, encoding= "ISO-8859-1") as report_file:
                     filestr = report_file.read()
-                    self.dbutil.save_contracts(file_name, filestr, "")
+                    dbutil.save_contracts(file_name.rstrip(), filestr.rstrip())
                 report_file.close()
 
     def import_seed_data(self):  
@@ -44,7 +42,7 @@ class Data_Loader:
                 if line_count > 0:
                     keywords =  text_rank.text_rank(row[0].rstrip()) 
                     keywords = ", ".join(keywords)  
-                    self.dbutil.save_seed_data(keywords, row[0].rstrip(), row[1].rstrip())
+                    dbutil.save_seed_data(keywords.rstrip().lower().strip(), row[0].rstrip(), row[1].rstrip().lower().strip())
                 line_count += 1
         csvfile.close()
         
@@ -62,7 +60,7 @@ class Data_Loader:
                     sentence = str(sentence)
                     if len(sentence) > 4:   
                         print (">> Inseted Statements : ", sentence, " Label: ", label)
-                        dbutil.save_training_data(sentence, label.lower().strip(), "seed", "")
+                        dbutil.save_training_data(sentence, "seed", label=label.lower().strip(), score=100)
         return
 
     '''

@@ -1,15 +1,19 @@
 import pandas as pd
 from sklearn import naive_bayes
 from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
-from app.BQUtility import BQUtility
-from app.PreProcessText import PreProcessText
 from joblib import dump, load 
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
+from app.BQUtility import BQUtility
+from app.PreProcessText import PreProcessText
+from app.Risk_Score_Service import Risk_Score_Service
+
 # load the dataset
 labels, texts = [], []
 processTxt = PreProcessText()
+risk_score = Risk_Score_Service()
+dbutil = BQUtility()
 
 class Keyword_Classifier:
     def __init__(self) -> None:
@@ -42,6 +46,9 @@ class Keyword_Classifier:
         return 
 
     def evaluate_model(self):
+        self.prepare_training_data()
+        self.text_clf = load('./model/keyword/keyword_class.joblib')
+
         predicted = self.text_clf.predict(self.trainDF['text'])
 
         y_labels = self.trainDF['label'].to_numpy()
@@ -64,22 +71,21 @@ class Keyword_Classifier:
         return predicted[0], max(predicted_prob[0])
 
     def process_contract_data(self):       
-        dbutil = BQUtility()
         results = dbutil.get_contracts(page="true")
         for row in results:
             article_text = row["content"]
             print("Filename:", row["title"])  
             sentences = processTxt.get_sentences(article_text)
-            #sentences = re.split(r' *[\.\?!][\'"\)\]]* *', article_text)             
             for c_sentence in sentences: 
                 c_sentence = str(c_sentence)
                 if len(c_sentence) > 4:                     
                     predict_label, predict_prb = self.predict_text_data(c_sentence) 
                     score = predict_prb * 100  
+                    score = risk_score.calculate_score(article_text, score)
                     label = predict_label
 
                     if score > 75:
                         print ("Sentences : ", c_sentence, ", Result : ", label.lower().strip(), ", Score : ", score) 
-                        dbutil.save_training_data(c_sentence, label.lower().strip(), "generated", "")
+                        dbutil.save_training_data(c_sentence, "contract", label=label.lower().strip(), score=score)
         return 
 

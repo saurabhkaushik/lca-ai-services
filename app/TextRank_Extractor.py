@@ -7,6 +7,7 @@ from app.PreProcessText import PreProcessText
 nlp = spacy.load("en_core_web_sm")
 nlp.add_pipe("textrank")
 str_process = PreProcessText()
+dbutil = BQUtility()    
 
 class TextRank_Extractor: 
     def __init__(self) -> None:
@@ -23,14 +24,11 @@ class TextRank_Extractor:
         res = sorted(set(keyword), key = lambda x: keyword.count(x), reverse=True)
         return res
 
-    def extract_keyword_seed_data(self):
-        dbutil = BQUtility()    
-            
+    def extract_keyword_seed_data(self):            
         results = dbutil.get_seed_data()
         for row in results: 
             content = row['content'] 
             id = row['id']
-            label = row['label']
             if len(content) > 1: 
                 sentences = str_process.get_sentences(content)
                 for stmt in sentences: 
@@ -38,4 +36,4 @@ class TextRank_Extractor:
                     if len(stmt) > 0:   
                         keywords =  self.text_rank(stmt)
                         keywords = ", ".join(keywords)                 
-                        dbutil.update_seed_data_id(id, keywords, content, label)
+                        dbutil.update_seed_data_id(id, keywords.lower().strip())

@@ -8,14 +8,18 @@ from datasets import Dataset
 from sklearn import preprocessing
 from transformers import TrainingArguments, Trainer
 import re
-from app.BQUtility import BQUtility
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-from app.PreProcessText import PreProcessText
 
-processTxt = PreProcessText()
+from app.BQUtility import BQUtility
+from app.PreProcessText import PreProcessText
+from app.Risk_Score_Service import Risk_Score_Service
+
 model_checkpoint = "distilbert-base-uncased"
 tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
+
 dbutil = BQUtility()
+risk_score = Risk_Score_Service()
+processTxt = PreProcessText()
 
 class Transformer_Classifier:
     label_y = dict()
@@ -94,7 +98,7 @@ class Transformer_Classifier:
         results = classifier(sentences)
         return results 
 
-    def process_contract(self, article_text):
+    def process_contract_request(self, article_text):
         return_value = {}
         sentences = processTxt.get_sentences(article_text)
         for c_sentence in sentences:
@@ -102,6 +106,7 @@ class Transformer_Classifier:
             if len(c_sentence) > 0 and len(c_sentence) < 512:
                 results = self.predict(c_sentence)
                 score = (results[0]["score"]  * 100)
+                score = risk_score.calculate_score(c_sentence, score)
                 try: 
                     res = re.search(c_sentence, article_text) # TODO Revisite 
                     if not res == None:
@@ -114,39 +119,20 @@ class Transformer_Classifier:
                     print("re.error")            
 
         return return_value
-
-    def process_contract_training_data(self):
-        results = dbutil.get_contracts()
-        for row in results:
-            article_text = row["content"]
-            sentences = processTxt.get_sentences(article_text)
-            for c_sentence in sentences:
-                c_sentence = str(c_sentence)
-                if len(c_sentence) > 0 and len(c_sentence) < 512:
-                    try: 
-                        results = self.predict(c_sentence)
-                    except RuntimeError:
-                        print ("Tensor size issues.")
-                    else: 
-                        score = (results[0]["score"]  * 100)   
-                        label = results[0]["label"]                    
-                        if score > 40:
-                            print ("Sentences : ", c_sentence, ", Result : ", label, ", Score : ", score)                   
-                            dbutil.save_training_data(c_sentence, label, "generated", "")
-        return 
     
-    def evaluate_contract_training_data(self):
+    def process_contract_training_data_eval(self):
         results = self.dbutil.get_training_data()
         for row in results:
             article_text = row["content"]
             if len(article_text) > 0 and len(article_text) < 512:
                 results = self.predict(article_text)
                 score = (results[0]["score"]  * 100) 
+                score = risk_score.calculate_score(article_text, score)
                 label = results[0]["label"] 
-                dbutil.update_training_data(row['id'], label)
+                dbutil.update_training_data(row['id'], label, score)
         return 
 
-    def evalute_results(self):
+    def evalute_model(self):
         ref = []
         pred = []
         
@@ -172,4 +158,28 @@ class Transformer_Classifier:
         clf_metrics = evaluate.combine(["accuracy", "f1", "precision", "recall"])
         clf_results = clf_metrics.compute(references= ref, predictions=pred)
         print ("CLF Results : ", clf_results)
+'''
+'''
+    def process_contract_training_data(self):
+        results = dbutil.get_contracts()
+        for row in results:
+            article_text = row["content"]
+            sentences = processTxt.get_sentences(article_text)
+            for c_sentence in sentences:
+                c_sentence = str(c_sentence)
+                if len(c_sentence) > 0 and len(c_sentence) < 512:
+                    try: 
+                        results = self.predict(c_sentence)
+                    except RuntimeError:
+                        print ("Tensor size issues.")
+                    else: 
+                        score = (results[0]["score"]  * 100)   
+                        score = risk_score.calculate_score(c_sentence, score)
+                        label = results[0]["label"]                    
+                        if score > 40:
+                            print ("Sentences : ", c_sentence, ", Result : ", label, ", Score : ", score)                   
+                            dbutil.save_training_data(c_sentence, label, "generated", "")
+        return 
+
+
 '''

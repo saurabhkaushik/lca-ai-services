@@ -41,7 +41,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         if not contract: 
             flash('contract is required!')
             return
-        answer_results = class_service.process_contract(contract)
+        answer_results = class_service.process_contract_request(contract)
         answer_results = score_service.highlight_ranking(answer_results)
         print("Contract Analysis : ", answer_results)
         return jsonify(answer_results)
@@ -55,7 +55,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     @apps.route('/test_service', methods=('GET', 'POST'))
     def test_service():  
         contract = "This is a very legalised way of doing businesss."
-        answer_results = class_service.process_contract(contract)
+        answer_results = class_service.process_contract_request(contract)
         answer_results = score_service.highlight_ranking(answer_results)
         print("Contract Analysis : ", answer_results)
         return jsonify(answer_results)

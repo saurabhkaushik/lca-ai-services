@@ -32,6 +32,7 @@ class BQUtility:
             bigquery.SchemaField("created", "TIMESTAMP", mode="REQUIRED"),
             bigquery.SchemaField("title", "STRING", mode="NULLABLE"),
             bigquery.SchemaField("content", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("type", "STRING", mode="NULLABLE"), # curated, users
             bigquery.SchemaField("response", "STRING", mode="NULLABLE"),
             bigquery.SchemaField("userid", "STRING", mode="NULLABLE")
         ]
@@ -41,16 +42,20 @@ class BQUtility:
             bigquery.SchemaField("created", "TIMESTAMP", mode="NULLABLE"),
             bigquery.SchemaField("keywords", "STRING", mode="NULLABLE"),
             bigquery.SchemaField("content", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("label", "STRING", mode="NULLABLE")
+            bigquery.SchemaField("type", "STRING", mode="NULLABLE"), # curated, users 
+            bigquery.SchemaField("label", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("userid", "STRING", mode="NULLABLE")
         ]
 
         schema_training_data = [
             bigquery.SchemaField("id", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("created", "TIMESTAMP", mode="REQUIRED"),
             bigquery.SchemaField("content", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("type", "STRING", mode="NULLABLE"),  # seed, contract  
             bigquery.SchemaField("label", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("type", "STRING", mode="NULLABLE"),
-            bigquery.SchemaField("eval_label", "STRING", mode="NULLABLE")
+            bigquery.SchemaField("eval_label", "STRING", mode="NULLABLE"),
+            bigquery.SchemaField("score", "INTEGER", mode="NULLABLE"),
+            bigquery.SchemaField("eval_score", "INTEGER", mode="NULLABLE")
         ]
 
         try:
@@ -87,7 +92,7 @@ class BQUtility:
     # Contracts CRUD 
     def get_contracts(self, page="true"): 
         uuid_query = "SELECT * from " + self.table_id1
-        if page == "true":
+        if page == "rue":
             uuid_query += " Limit " + str(50)
         print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
@@ -116,7 +121,7 @@ class BQUtility:
         results = query_job.result()
         return results
     
-    def save_contracts(self, title, content, response): 
+    def save_contracts(self, title, content, type = 'curated', response = '', userid='admin'): 
         uuid_query = "SELECT GENERATE_UUID() AS uuid;"
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
@@ -124,7 +129,7 @@ class BQUtility:
             uuid = row.uuid
 
         rows_to_insert = [
-            {"id": uuid, "title" : title, "content" : content, "created" : "2022-01-01 01:01", "response" : response, "userid" : "admin"}
+            {"id": uuid, "created" : "2022-01-01 01:01", "title" : title, "content" : content,  "type" : type, "response" : response, "userid" : userid}
             ]
 
         errors = self.client.insert_rows_json(
@@ -151,7 +156,7 @@ class BQUtility:
         results = query_job.result()  # Wait for the job to complete. 
         return results
 
-    def save_seed_data(self, keywords, content, label):
+    def save_seed_data(self, keywords, content, label, type='curated', userid='admin'):
         uuid_query = "SELECT GENERATE_UUID() AS uuid;"
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
@@ -159,7 +164,7 @@ class BQUtility:
             uuid = row.uuid
 
         rows_to_insert = [
-            {"id": uuid, "keywords" : keywords, "content" : content, "created" : "2022-01-01 01:01", "label" : label}
+            {"id": uuid, "created" : "2022-01-01 01:01", "keywords" : keywords, "content" : content, "label" : label, "type" : type, "userid" : userid}
             ]
 
         errors = self.client.insert_rows_json(
@@ -172,9 +177,9 @@ class BQUtility:
         
         return uuid
 
-    def update_seed_data_id(self, id, keywords, content, label): 
+    def update_seed_data_id(self, id, keywords): 
         uuid_query = "UPDATE " + self.table_id2 + " SET keywords = \'" + keywords + \
-            "\', content = \'" + content + "\', label = \'" + label + "\' where id = \'" + id + "\'"
+            "\' where id = \'" + id + "\'"
         print (uuid_query)
         query_job = self.client.query(uuid_query)  
         results = query_job.result()
@@ -188,7 +193,7 @@ class BQUtility:
         return results 
 
     # Training Data CRUD 
-    def save_training_data(self, content, label, type, eval_label): 
+    def save_training_data(self, content, type, label='', eval_label='', score=0, eval_score=0): 
         uuid_query = "SELECT GENERATE_UUID() AS uuid;"
         query_job = self.client.query(uuid_query)  # Make an API request.
         results = query_job.result()  # Wait for the job to complete. 
@@ -196,7 +201,7 @@ class BQUtility:
             uuid = row.uuid
 
         rows_to_insert = [
-            {"id": uuid, "content" : content, "created" : "2022-01-01 01:01", "label" : label, "type" : type, "eval_label" : eval_label}
+            {"id": uuid, "created" : "2022-01-01 01:01", "content" : content, "type" : type, "label" : label, "eval_label" : eval_label, "score" : score, "eval_score" : eval_score}
             ]
 
         errors = self.client.insert_rows_json(
@@ -217,8 +222,9 @@ class BQUtility:
         results = query_job.result()  # Wait for the job to complete. 
         return results
 
-    def update_training_data(self, id, eval_label): 
-        uuid_query = "UPDATE " + self.table_id3 + " SET eval_label = \'" + eval_label + "\'" + " where id = \'" + id + "\'"
+    def update_training_data(self, id, eval_label, eval_score): 
+        uuid_query = "UPDATE " + self.table_id3 + " SET eval_label = \'" + eval_label  + \
+            "\" eval_score = " + eval_score + " where id = \'" + id + "\'"
         print (uuid_query)
         query_job = self.client.query(uuid_query)  # Make an API request.
         query_job.result()
