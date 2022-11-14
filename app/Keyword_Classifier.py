@@ -5,7 +5,7 @@ from joblib import dump, load
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-from app.BQUtility import BQUtility
+from app.MySQLUtility import MySQLUtility
 from app.PreProcessText import PreProcessText
 from app.Risk_Score_Service import Risk_Score_Service
 
@@ -13,7 +13,7 @@ from app.Risk_Score_Service import Risk_Score_Service
 labels, texts = [], []
 processTxt = PreProcessText()
 risk_score = Risk_Score_Service()
-dbutil = BQUtility()
+dbutil = MySQLUtility()
 
 class Keyword_Classifier:
     def __init__(self) -> None:
@@ -23,11 +23,10 @@ class Keyword_Classifier:
     text_clf = ""
 
     def prepare_training_data(self):
-        dbutil = BQUtility()    
-
         results = dbutil.get_seed_data()
         for row in results: 
-            if (len(row['keywords'])) > 0:
+            keywords = row['keywords']
+            if (keywords != None and len(keywords)) > 0:
                 labels.append(row['label'])
                 texts.append(row['keywords'])
                 
@@ -72,6 +71,7 @@ class Keyword_Classifier:
 
     def process_contract_data(self):       
         results = dbutil.get_contracts(page="true")
+        batch_insert = []    
         for row in results:
             article_text = row["content"]
             print("Filename:", row["title"])  
@@ -80,12 +80,14 @@ class Keyword_Classifier:
                 c_sentence = str(c_sentence)
                 if len(c_sentence) > 4:                     
                     predict_label, predict_prb = self.predict_text_data(c_sentence) 
-                    score = predict_prb * 100  
-                    score = risk_score.calculate_score(article_text, score)
-                    label = predict_label
+                    p_score = predict_prb * 100  
+                    c_score = risk_score.calculate_score(c_sentence, p_score)
+                    label = predict_label.lower().strip()
 
-                    if score > 75:
-                        print ("Sentences : ", c_sentence, ", Result : ", label.lower().strip(), ", Score : ", score) 
-                        dbutil.save_training_data(c_sentence, "contract", label=label.lower().strip(), score=score)
+                    if p_score > 75:
+                        print ("Sentences : ", c_sentence, ", Result : ", label.lower().strip(), ", Score : ", c_score) 
+                        insert_json = {"content" : c_sentence, "type" : "contract", "label" : label, "eval_label" : '', "score" : str(int(c_score)), "eval_score" : 0, "domain" : 'liability', "userid": "admin"}
+                        batch_insert.append(insert_json)
+        dbutil.save_training_data_batch(batch_insert) 
         return 
 

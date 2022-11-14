@@ -4,12 +4,12 @@ from werkzeug.exceptions import abort
 from flask import make_response, jsonify
 
 from app.Transformer_Classifier import Transformer_Classifier 
-from app.BQUtility import BQUtility
+from app.MySQLUtility import MySQLUtility
 from app.Risk_Score_Service import Risk_Score_Service
 
 score_service = Risk_Score_Service()   
 class_service = Transformer_Classifier()
-dbutil = BQUtility() 
+dbutil = MySQLUtility() 
 
 def create_app(config, debug=False, testing=False, config_overrides=None):
     apps = Flask(__name__)
@@ -18,6 +18,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     apps.testing = testing
 
     dbutil.create_database() 
+    model = class_service.load_model()
 
     if config_overrides:
         apps.config.update(config_overrides)
@@ -41,7 +42,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         if not contract: 
             flash('contract is required!')
             return
-        answer_results = class_service.process_contract_request(contract)
+        answer_results = class_service.process_contract_request(contract, model)
         answer_results = score_service.highlight_ranking(answer_results)
         print("Contract Analysis : ", answer_results)
         return jsonify(answer_results)

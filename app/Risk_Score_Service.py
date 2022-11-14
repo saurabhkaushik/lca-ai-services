@@ -1,10 +1,10 @@
-from app.BQUtility import BQUtility
+from app.MySQLUtility import MySQLUtility
 import spacy 
 from nltk.stem import WordNetLemmatizer
   
 lemmatizer = WordNetLemmatizer()
 nlp = spacy.load('en_core_web_sm')
-dbutil = BQUtility()
+dbutil = MySQLUtility()
 from transformers import pipeline
 sentiment_pipeline = pipeline("sentiment-analysis")
 
@@ -33,7 +33,7 @@ class Risk_Score_Service:
         sent_score = (sent_result[0]['score']) if sent_result[0]['label'] == 'POSITIVE' else -(sent_result[0]['score'])
         sent_score = sent_score * 100
         adj_score = (sent_score * score) / 100
-        print('Sentiment Score: ', sent_score, ' Original Score: ', score, ' Adjusted Score: ', adj_score)
+        #print(' Original Score: ', score, ' Sentiment Score: ', sent_score >> ' Adjusted Score: ', adj_score)
         return adj_score
 
     def get_keywords(self):

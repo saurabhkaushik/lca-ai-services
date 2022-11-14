@@ -10,14 +10,14 @@ from transformers import TrainingArguments, Trainer
 import re
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-from app.BQUtility import BQUtility
+from app.MySQLUtility import MySQLUtility
 from app.PreProcessText import PreProcessText
 from app.Risk_Score_Service import Risk_Score_Service
 
 model_checkpoint = "distilbert-base-uncased"
 tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
 
-dbutil = BQUtility()
+dbutil = MySQLUtility()
 risk_score = Risk_Score_Service()
 processTxt = PreProcessText()
 
@@ -44,7 +44,7 @@ class Transformer_Classifier:
 
     def prepare_train_dataset(self): 
         processed_data = []    
-        train_data = self.dbutil.get_training_data()
+        train_data = dbutil.get_training_data()
         
         label_count = 0
         for row in train_data:        
@@ -54,7 +54,7 @@ class Transformer_Classifier:
                 self.label_x.update({label_count : key})
                 label_count += 1
         
-        train_data = self.dbutil.get_training_data()
+        train_data = dbutil.get_training_data()
         for row in train_data:  
             processed_data.append(self.process_data(row))
             
@@ -70,7 +70,13 @@ class Transformer_Classifier:
         valid_hg = Dataset(pa.Table.from_pandas(valid_df))
         return train_hg, valid_hg
 
-    def training(self, train_hg, valid_hg):
+    def load_model(self):
+        model = AutoModelForSequenceClassification.from_pretrained('./model/')
+        return model
+
+    def training(self):
+        train_hg, valid_hg = self.prepare_train_dataset()
+        
         training_args = TrainingArguments(output_dir="./result", evaluation_strategy="epoch")
         id2label = self.label_x
         label2id = {val: key for key, val in id2label.items()}
@@ -92,19 +98,19 @@ class Transformer_Classifier:
         model.save_pretrained('./model/')
         return model
 
-    def predict(self, sentences): 
-        model = AutoModelForSequenceClassification.from_pretrained('./model/')
-        classifier = pipeline("text-classification", model=model, tokenizer=self.tokenizer)
+    def predict(self, sentences, model): 
+        classifier = pipeline("text-classification", model=model, tokenizer=tokenizer)
         results = classifier(sentences)
         return results 
 
-    def process_contract_request(self, article_text):
+    def process_contract_request(self, article_text, model):
+        #model = AutoModelForSequenceClassification.from_pretrained('./model/')
         return_value = {}
         sentences = processTxt.get_sentences(article_text)
         for c_sentence in sentences:
             c_sentence = str(c_sentence)
             if len(c_sentence) > 0 and len(c_sentence) < 512:
-                results = self.predict(c_sentence)
+                results = self.predict(c_sentence, model)
                 score = (results[0]["score"]  * 100)
                 score = risk_score.calculate_score(c_sentence, score)
                 try: 
@@ -121,22 +127,28 @@ class Transformer_Classifier:
         return return_value
     
     def process_contract_training_data_eval(self):
-        results = self.dbutil.get_training_data()
+        model = AutoModelForSequenceClassification.from_pretrained('./model/')
+        results = dbutil.get_training_data()
+        batchupdate = []
         for row in results:
             article_text = row["content"]
             if len(article_text) > 0 and len(article_text) < 512:
-                results = self.predict(article_text)
+                results = self.predict(article_text, model)
                 score = (results[0]["score"]  * 100) 
                 score = risk_score.calculate_score(article_text, score)
                 label = results[0]["label"] 
-                dbutil.update_training_data(row['id'], label, score)
+                single_d = {"id": row['id'], "eval_label":label, "eval_score":score}
+                #print ("Updated Statements : ", article_text, label, score)
+                batchupdate.append(single_d)
+        print (len(batchupdate))
+        dbutil.update_training_data_batch(batchupdate)
         return 
 
     def evalute_model(self):
         ref = []
         pred = []
         
-        results = self.dbutil.get_training_data()        
+        results = dbutil.get_training_data()        
         for row in results:
             ref.append(row["label"].lower().strip())
             pred.append(row["eval_label"].lower().strip())
