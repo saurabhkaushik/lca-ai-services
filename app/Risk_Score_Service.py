@@ -6,7 +6,7 @@ lemmatizer = WordNetLemmatizer()
 nlp = spacy.load('en_core_web_sm')
 dbutil = MySQLUtility()
 from transformers import pipeline
-sentiment_pipeline = pipeline("sentiment-analysis")
+sentiment_pipeline = pipeline("sentiment-analysis", model = "distilbert-base-uncased-finetuned-sst-2-english")
 
 class Risk_Score_Service:
 

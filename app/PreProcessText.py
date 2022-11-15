@@ -1,8 +1,10 @@
+import re
 import string
-import spacy 
-import re 
+
+import spacy
+from nltk.stem import PorterStemmer, WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
-from nltk.stem import WordNetLemmatizer,PorterStemmer
+
 lemmatizer = WordNetLemmatizer()
 stemmer = PorterStemmer() 
 from nltk.corpus import stopwords
@@ -14,7 +16,6 @@ class PreProcessText(object):
     def __init__(self):
         pass
 
-    nlp = spacy.load("en_core_web_sm")
     stopwords = nlp.Defaults.stop_words
 
     def __remove_punctuation(self, text):

@@ -1,12 +1,12 @@
-torch
-tensorflow
 Flask
+torch
 transformers
+evaluate
 gensim
 spacy
+scipy 
 PyTextRank
 datasets
-scipy 
-sklearn
-evaluate
+scikit-learn
 mysql-connector-python
+nltk

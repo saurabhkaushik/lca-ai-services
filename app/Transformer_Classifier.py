@@ -1,14 +1,13 @@
-from transformers import AutoModelForSequenceClassification
-from transformers import AutoTokenizer
-from transformers import pipeline
-from sklearn.model_selection import train_test_split
+import re
+
 import pandas as pd
 import pyarrow as pa
 from datasets import Dataset
-from sklearn import preprocessing
-from transformers import TrainingArguments, Trainer
-import re
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import (accuracy_score, classification_report,
+                             confusion_matrix)
+from sklearn.model_selection import train_test_split
+from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
+                          Trainer, TrainingArguments, pipeline)
 
 from app.MySQLUtility import MySQLUtility
 from app.PreProcessText import PreProcessText

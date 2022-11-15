@@ -1,9 +1,9 @@
-import mysql.connector
-
-from mysql.connector.constants import ClientFlag 
-import os
 import datetime
+import os
 import uuid
+
+import mysql.connector
+from mysql.connector.constants import ClientFlag
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = './store/genuine-wording-key.json'
 
