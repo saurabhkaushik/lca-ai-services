@@ -132,12 +132,13 @@ class Transformer_Classifier:
         batchupdate = []
         for row in results:
             article_text = row["content"]
-            if len(article_text) > 0 and len(article_text) < 512:
+            score_2 = row['score']
+            if article_text != None and len(article_text) > 0 and len(article_text) < 512:
                 results = self.predict(article_text, model)
                 score = (results[0]["score"]  * 100) 
                 score = risk_score.calculate_score(article_text, score)
                 label = results[0]["label"] 
-                single_d = {"id": row['id'], "eval_label":label, "eval_score":score}
+                single_d = {"id": row['id'], "score" : score_2, "eval_label":label, "eval_score":score}
                 #print ("Updated Statements : ", article_text, label, score)
                 batchupdate.append(single_d)
         print (len(batchupdate))

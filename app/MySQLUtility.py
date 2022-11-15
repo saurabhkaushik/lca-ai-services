@@ -139,7 +139,7 @@ class MySQLUtility:
     def save_contracts_batch(self, batch_data):
         cnxn = mysql.connector.connect(**config2)
         cursor = cnxn.cursor()  
-
+        uu_id = ''
         rows_to_insert = []
         insert_stmt = ("INSERT INTO contract_data (id, created, title, content, type, response, domain, userid) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
@@ -153,7 +153,7 @@ class MySQLUtility:
         cnxn.commit()
         cnxn.close()
         print(cursor.rowcount, "record(s) affected")
-        return None 
+        return uu_id 
     
     def update_contracts_id(self, id, title, content, response): 
         cnxn = mysql.connector.connect(**config2)
@@ -210,7 +210,7 @@ class MySQLUtility:
     def save_seed_data_batch(self, batch_data):
         cnxn = mysql.connector.connect(**config2)
         cursor = cnxn.cursor()  
-
+        uu_id = ''
         rows_to_insert = []
         insert_stmt = ("INSERT INTO " + self.table_id2 + " (id, created, keywords, content, type, label, domain, userid) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s);")
@@ -224,7 +224,7 @@ class MySQLUtility:
         cnxn.commit()
         cnxn.close()
         print(cursor.rowcount, "record(s) affected")
-        return None 
+        return uu_id 
 
     def update_seed_data_id(self, id, keywords): 
         cnxn = mysql.connector.connect(**config2)
@@ -324,10 +324,10 @@ class MySQLUtility:
 
         rows_to_insert = []
 
-        uuid_query = "UPDATE " + self.table_id3 + " SET eval_label = %s, eval_score = %s where id = %s;"
+        uuid_query = "UPDATE " + self.table_id3 + " SET score = %s, eval_label = %s, eval_score = %s where id = %s;"
 
         for row in batch_data:
-            insert_stmt =  (row['eval_label'], row['eval_score'], row['id'])               
+            insert_stmt =  (row['score'], row['eval_label'], row['eval_score'], row['id'])               
             rows_to_insert.append(insert_stmt)
         cursor.executemany(uuid_query, rows_to_insert)
 

@@ -17,7 +17,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     apps.debug = debug
     apps.testing = testing
 
-    dbutil.create_database() 
+    #dbutil.create_database() 
     model = class_service.load_model()
 
     if config_overrides:

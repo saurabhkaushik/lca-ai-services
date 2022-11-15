@@ -86,8 +86,30 @@ class Keyword_Classifier:
 
                     if p_score > 75:
                         print ("Sentences : ", c_sentence, ", Result : ", label.lower().strip(), ", Score : ", c_score) 
-                        insert_json = {"content" : c_sentence, "type" : "contract", "label" : label, "eval_label" : '', "score" : str(int(c_score)), "eval_score" : 0, "domain" : 'liability', "userid": "admin"}
+                        insert_json = {"content" : c_sentence, "type" : "contract", "label" : label, "eval_label" : '', "score" : c_score, "eval_score" : 0, "domain" : 'liability', "userid": "admin"}
                         batch_insert.append(insert_json)
         dbutil.save_training_data_batch(batch_insert) 
+        return 
+
+    def process_seed_data(self):       
+        results = dbutil.get_training_data(type="seed")
+        type = "seed"
+        batch_insert = []    
+        for row in results:
+            article_text = row["content"]
+            id = row['id']
+            eval_label = row['eval_label']
+            eval_score = row['eval_score']
+
+            sentences = processTxt.get_sentences(article_text)
+            for c_sentence in sentences: 
+                c_sentence = str(c_sentence)
+                if c_sentence != None and len(c_sentence) > 4:                     
+                    predict_label, predict_prb = self.predict_text_data(c_sentence) 
+                    p_score = predict_prb * 100  
+                    c_score = risk_score.calculate_score(c_sentence, p_score)
+                    insert_json = {"id" : id, "eval_label" : eval_label, "score" : c_score, "eval_score" : eval_score}
+                    batch_insert.append(insert_json)
+        dbutil.update_training_data_batch(batch_insert) 
         return 
 
