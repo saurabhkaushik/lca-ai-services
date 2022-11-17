@@ -11,7 +11,7 @@ from app.Risk_Score_Service import Risk_Score_Service
 
 # load the dataset
 labels, texts = [], []
-processTxt = PreProcessText()
+pre_process = PreProcessText()
 risk_score = Risk_Score_Service()
 dbutil = MySQLUtility()
 
@@ -62,6 +62,7 @@ class Keyword_Classifier:
         self.text_clf = load('./model/keyword/keyword_class.joblib')
         predictDF = pd.DataFrame()
         texts = []
+        text = pre_process.preprocess_text(text)
         texts.append(text)
         predictDF['text'] = texts
         predicted = self.text_clf.predict(predictDF['text'])
@@ -75,9 +76,10 @@ class Keyword_Classifier:
         for row in results:
             article_text = row["content"]
             print("Filename:", row["title"])  
-            sentences = processTxt.get_sentences(article_text)
+            sentences = pre_process.get_sentences(article_text)
             for c_sentence in sentences: 
                 c_sentence = str(c_sentence)
+                c_sentence = pre_process.clean_text(c_sentence)
                 if len(c_sentence) > 4:                     
                     predict_label, predict_prb = self.predict_text_data(c_sentence) 
                     p_score = predict_prb * 100  
@@ -101,7 +103,7 @@ class Keyword_Classifier:
             eval_label = row['eval_label']
             eval_score = row['eval_score']
 
-            sentences = processTxt.get_sentences(article_text)
+            sentences = pre_process.get_sentences(article_text)
             for c_sentence in sentences: 
                 c_sentence = str(c_sentence)
                 if c_sentence != None and len(c_sentence) > 4:                     

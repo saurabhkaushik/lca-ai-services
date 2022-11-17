@@ -1,0 +1,132 @@
+﻿Statements,Label
+"Accounts payable These are the yet-to-be-paid bills to the company’s vendors. Generally, accounts payable are the largest current liability for most businesses.",Current liabilities
+"Interest payable interest expense that has already been incurred but has not been paid. Interest payable should not be confused with interest expense, which is the expense on an income statement. ",Current liabilities
+"Income taxes payable the income tax amount owed by a company to the government. The tax amount owed must generally be payable within one year. Otherwise, the tax owed would be classified as a long-term liability.",Current liabilities
+"Bank account overdrafts effectively, a type of short-term loan provided by a bank when a payment is processed with insufficient funds available in the bank account.",Current liabilities
+"Accrued expenses expenses that have been incurred but no supporting documentation (e.g., invoice) has been received or issued to the company by the vendor.",Current liabilities
+Deferred revenue (also called unearned revenue). Generated when a company receives early payment for goods and/or services that have not been delivered or completed yet.,Current liabilities
+Short-term loans or current portion of long-term debt loans or other borrowings with a maturity of one year or less .,Current liabilities
+The current ratio current assets divided by current liabilities.,Current liabilities
+"The quick ratio current assets, minus inventory, divided by current liabilities.",Current liabilities
+The cash ratio cash and cash equivalents divided by current liabilities.,Current liabilities
+"Bonds payable The amount of outstanding bonds with a maturity of over one year issued by a company. On a balance sheet, the bonds payable account indicates the value of the company’s outstanding bonds.",Non-current liabilities
+"Notes payable The amount of promissory notes with a maturity of over one year issued by a company. Similar to bonds payable, the notes payable account on a balance sheet indicates the value of the promissory notes.",Non-current liabilities
+"Deferred tax liabilities These arise from the difference between the amount of tax recognized on the income statement and the actual tax amount due to be paid to the appropriate tax authorities. As a liability, it essentially means that the company “underpays” the taxes in the current period and will “overpay” the taxes at some point in the future.",Non-current liabilities
+"Mortgage payable/long-term debt If a company takes out a mortgage or a long-term debt, it records the value of the borrowed principal amount as a non-current liability on the balance sheet.",Non-current liabilities
+Leases Leases are recognized as a liability when a company enters into a long-term rental agreement for property or equipment. The lease amount is the present value of the lessee’s obligation.,Non-current liabilities
+"Contingent liabilities are a special category of liabilities. They are possible liabilities that may or may not arise, depending on the outcome of an uncertain future event. A contingent liability is recognized only if both of the following conditions are met.",Contingent liabilities
+The outcome is probable.,Contingent liabilities
+The liability amount can be reasonably estimated.,Contingent liabilities
+"If one of the conditions is not satisfied, a company does not report a contingent liability on the balance sheet. However, it should disclose this item in a footnote on the financial statements.",Contingent liabilities
+"One of the most common examples of contingent liabilities is legal liabilities. Suppose that a company is involved in litigation. Due to the stronger evidence provided by the opposite party, the company expects to lose the case in court, which will result in legal expenses. The legal expenses may be recognized as contingent liabilities .",Contingent liabilities
+The expenses are probable.,Contingent liabilities
+The legal expenses can be reasonably estimated (based on the remedies asked by the opposite party).,Contingent liabilities
+"It refers to those financial obligations which a company is liable to settle or pay off within 12 months. Hence, they are also called short-term liabilities. They form an essential part of a company’s workday functions as current liabilities directly affect its working capital and impact its liquidity.",Current liabilities
+Working capital = Current assets – Current liabilities.,Current liabilities
+"Examples of current liabilities are – bills payables, trade payable, creditors, bank overdraft, outstanding or accrued expenses, short-term loans or debentures, etc.",Current liabilities
+"Current liability also acts as a guiding component for crucial metrics that determine a company’s short-term financial strength and standing. It is used to derive ratios such as quick ratio, current ratio, and cash ratio.",Current liabilities
+Accounts payable.,Current liabilities
+Short-term loans.,Current liabilities
+Accrued expenses.,Current liabilities
+Bank account overdrafts.,Current liabilities
+Bills payable.,Current liabilities
+Income taxes payable.,Current liabilities
+Customer deposits.,Current liabilities
+Salaries payable.,Current liabilities
+"Non-current liabilities, as the name suggests, are financial obligations that a company is not liable to pay off or settle in the short run of its business operations, i.e. 12 months. It is also referred to as long-term liabilities.",Non-current liabilities
+"This group of liabilities is used to derive several crucial metrics which pose as formidable quantifiers of a company’s financial health. For instance, long-term debt-to-total-assets ratio aids in understanding to what extent a company is dependent on borrowings to finance its capital operations.",Non-current liabilities
+"A low percentage implies that a company is not heavily dependent on borrowed capital and primarily functions on the owner’s capital. However, it is essential to understand which percentage qualifies as healthy depending on the respective industry.",Non-current liabilities
+"Examples of non-current liabilities are – debentures, mortgage loans, deferred tax payable, bonds, derivative liabilities, etc.",Non-current liabilities
+"Analysts reckon a company’s potential to pay off its non-current liabilities with future earnings to determine its bankability and the risk it poses to shareholders. In other words, the non-current liabilities of a company are quintessential to approximating its long-term solvency. Hence, investors seeking to engage in long-term investments shall always glance at the long-term liabilities of an organisation before forming a decision.",Non-current liabilities
+Deferred tax liabilities.,Non-current liabilities
+Mortgage payable.,Non-current liabilities
+Bonds payable.,Non-current liabilities
+Capital leases,Non-current liabilities
+Long-term notes payable.,Non-current liabilities
+"Although it was mentioned earlier that liabilities are categorised based on their priority of settlement, this type digresses to that definition. Contingent liabilities are referred to as those obligations that might or might not arise in the future.",Contingent liabilities
+"In the accounting context, contingent liabilities are only recorded in the books if they are at least 50% likely to occur in the future. One primary example of such is a lawsuit. A lawsuit stands a 50% chance of being successful, thus posing as a potential obligation to such an organisation.",Contingent liabilities
+Warranty liability,Contingent liabilities
+Lawsuits payable,Contingent liabilities
+Investigation.,Contingent liabilities
+"Ideally, analysts want to see that a company can pay current liabilities, which are due within a year, with cash. Some examples of short-term liabilities include payroll expenses and accounts payable, which include money owed to vendors, monthly utilities, and similar expenses. Other examples include.",Current liabilities
+Wages Payable.,Current liabilities
+Interest Payable.,Current liabilities
+Dividends Payable.,Current liabilities
+Unearned Revenues.,Current liabilities
+Liabilities of Discontinued Operations.,Current liabilities
+"Considering the name, it’s quite obvious that any liability that is not near-term falls under non-current liabilities, expected to be paid in 12 months or more. Referring again to the AT&T example, there are more items than your garden variety company that may list one or two items. Long-term debt, also known as bonds payable, is usually the largest liability and at the top of the list.",Non-current liabilities
+"Companies of all sizes finance part of their ongoing long-term operations by issuing bonds that are essentially loans from each party that purchases the bonds. This line item is in constant flux as bonds are issued, mature, or called back by the issuer.",Non-current liabilities
+"Analysts want to see that long-term liabilities can be paid with assets derived from future earnings or financing transactions. Bonds and loans are not the only long-term liabilities companies incur. Items like rent, deferred taxes, payroll, and pension obligations can also be listed under long-term liabilities. Other examples include",Non-current liabilities
+Warranty Liability.,Non-current liabilities
+Contingent Liability Evaluation.,Non-current liabilities
+Deferred Credits.,Non-current liabilities
+Post-Employment Benefits.,Non-current liabilities
+Unamortized Investment Tax Credits (UITC).,Non-current liabilities
+These are the short-term debt owed by the business that must be paid within the period of one year. Most of these debts are used for regular business operations. These are of the following types.,Current liabilities
+"Interest payable This represents the amount of interest expense accrued to date but is not paid to date as per the balance sheet. That is why interest payable is also known as accrued interest. Let us understand this with an example. Suppose that the incurred interest is 20,000 rupees that are to be paid during the next fiscal year. In such a case, this journal entry will be recorded as ‘Interest payable.",Current liabilities
+Accounts Payable This is another short-term liability that must be paid within one year. It is generated whenever a company purchases goods and services from its suppliers. These get reduced when the company pays off its obligations. Accounts payable is a useful metric in the balance sheet. Experts can measure the company’s liquidity using AP. It is also used in planning the cash cycle.,Current liabilities
+Accrued expenses These expenses are recognized at the time when they are incurred. This happens regardless of whether the fact that cash has been paid or not. There are two common types of AP.,Current liabilities
+"Income tax payables Since income tax needs to be paid within the period of one year, it comes under the category of current liabilities. Other taxes are classified as long-term liabilities.",Current liabilities
+Bank account overdrafts The bank provides a short-term loan when the payment is processed with insufficient funds available in the bank account. ,Current liabilities
+These refer to financial obligations that are due in more than one year. These long-term debts can help companies with financing. Companies use these long-term debts for gaining capital for investment purposes and the purchase of assets.  ,Non-current liabilities
+The following are the different types of non-current debts.,Non-current liabilities
+"Bonds payable These are recorded whenever a company issues bonds to generate cash. The act of issuing the bond creates liability. These can be issued at discount, at par, and at a premium. The pricing of a bond is dependent on the difference between the coupon rate and the market yield on the issuance. ",Non-current liabilities
+"Deferred Tax Liability It arises when there is a difference between the amount that the company deducts as tax and the taxes for accounting purposes. These are the taxes that have been incurred but yet not been paid. This line item on the balance sheet reserves money for a specific expense in the future. This reduces the company’s cash flow available for expenditure but still, the company can use it for paying taxes.",Non-current liabilities
+Mortgage payable It is a promissory note that is secured by an asset and the title of the asset is then pledged to the lender. It is payable in equal installments that consist of both principal and interest throughout the loan term. This is usually done for purchasing a property.,Non-current liabilities
+Capital lease It is a contract that entitles a lender to use assets on a temporary basis. This contract has economic characteristics of asset ownership for the purpose of accounting. It is also recorded on the balance sheet. The renter books assets and liabilities with the lease in case the rental contract meets certain requirements.,Non-current liabilities
+"These are potential liabilities that may occur based on the outcome of a future event. These may or may not happen. Therefore, such debts are recorded in accounting records only if the probability of occurrence is more than 50%. Outstanding lawsuits, government probes, liquidated damages, and product warranties are examples of contingent liabilities.",Contingent liabilities
+A contingent liability has the potential to negatively impact the future net profitability and cash flow of a company. Therefore knowledge of the liability can help investors and creditors in making better decisions. These can also reduce profit generation for the company.,Contingent liabilities
+Current liabilities are those liabilities that are due and need to be paid within an accounting period (which is usually a year or 12 months). Current liabilities are also known as short-term liabilities due to the relatively short turnaround time.,Current liabilities
+Current liabilities need to be closely monitored by the management of a company as a company needs to have sufficient liquidity in the form of current assets in order to pay off the current liabilities.,Current liabilities
+Current liabilities have a direct impact on the working capital and also on the liquidity of the business.,Current liabilities
+Some of the examples of current liabilities are.,Current liabilities
+1. Interest Payable.,Current liabilities
+2. Accounts Payable.,Current liabilities
+3. Short term loans.,Current liabilities
+4. Accrued Expenses.,Current liabilities
+5. Bank overdraft.,Current liabilities
+These liabilities help businesses acquire capital assets by providing the required capital. Businesses can also invest in new capital projects using the funds obtained from long term debts or liabilities.,Non-current liabilities
+"Long term liabilities are an important indicator of the solvency of the business. A company which is unable to pay off long term liabilities as and when they become due, indicates a solvency issue with the business or it signals a crisis within the business.",Non-current liabilities
+Investors always look at the long term liabilities of the business before investing.,Non-current liabilities
+Some examples of long term liabilities .,Non-current liabilities
+1. Deferred tax liabilities.,Non-current liabilities
+2. Bonds payable.,Non-current liabilities
+3. Capital leases.,Non-current liabilities
+4. Debentures.,Non-current liabilities
+"Contingent liabilities are a special type of liability that may occur during the course of a business, depending on the outcome of an event that may take place in the future.",Contingent liabilities
+"In accounting standards, contingent liabilities are recorded as potential or probable liabilities only if they have a 50% chance of occurring and when the amount of liability can be estimated properly.",Contingent liabilities
+Some of the examples of contingent liabilities. ,Contingent liabilities
+1. Product warranties.,Contingent liabilities
+2. Lawsuits. ,Contingent liabilities
+Current liabilities are referred to liabilities that are payable within a period of 12 months from the time of receipt of economic benefit.,Current liabilities
+"Say, if an entity has to pay creditors by virtue of purchase of raw material in 1-month time, then that liability will be categorized under current liabilities. Similarly, the interest liability related to a long-term loan, which is payable within the next year, will come under current liabilities.",Current liabilities
+See also  How Many Types of Adjustable-rate Mortgages? All You Need To Know. ,Current liabilities
+Examples of Current Liabilities.,Current liabilities
+"Apart from interest payable and the current portion of a long-term loan, many liabilities can be classified under the term current liabilities.",Current liabilities
+"These include salaries and wages payable and creditors payable, advance received from vendors, monthly utilities, and rent payable.",Current liabilities
+"In certain circumstances, the timing or the value of the financial liability will be uncertain, and these are referred to as ‘provisions’ in the balance sheet. These are also classified as current.",Current liabilities
+The typical list of items found under this headinh.,Current liabilities
+Accounts Payable – It is referred to as the sum of all unpaid vendors & service providers.,Current liabilities
+"Accrued Payroll – Usually, employees are paid in arrears. Thus, liability against salaries due is recorded as accrued payroll.",Current liabilities
+"Other Accrued Liabilities – As on the balance sheet, various expenses have been incurred by the organization, but their invoice has not yet been received, for example, utility bills and rents payable.",Current liabilities
+"Current Portion of Long-term Loan – in case of a loan that is payable is more than one year, this heading would only include the portion of loan and interest that is payable in the current 12-months.",Current liabilities
+Non-current liabilities are the liabilities that are payable after a period of 12 months.,Non-current liabilities
+"For example, if a debt is payable over a period of 5 years, then the amount payable after one year shall be classified under long-term liabilities.",Non-current liabilities
+"As explained earlier, the amount owed within the next 12 months shall be classified under current liabilities.",Non-current liabilities
+"Similarly, all other liabilities that are not required to be paid within the next 12 months shall be categorized as a long-term liability.",Non-current liabilities
+See also  What is a Budgeted Cost? (Explained). ,Non-current liabilities
+Examples of Non-Current Liabilities,Non-current liabilities
+"Non-current liabilities include bonds or notes payable, finance leases, pension liabilities, post-retirement liabilities, deferred compensation.",Non-current liabilities
+The typical list of items found listed under this heading are,Non-current liabilities
+"Notes payable – The Notes Payable is a financial liability in which a borrower’s written promise to pay cash to a lender is recorded. (The lender records such promise as Notes Receivable). Generally, the written note specifies the principal amount, the interest to be paid, and the date due.",Non-current liabilities
+"For most entities, if the note will be due within 12 months, the borrower will classify such note payable under current liability.",Non-current liabilities
+"If the note is due after 12 months, the note payable will be recorded under non-current liability.",Non-current liabilities
+"Pension obligations – The term pension obligation refers to the expenses or liabilities incurred and payable in the future, associated with the entity’s pension plan. Generally, pension obligations can be recorded in terms of accumulated, vested, and projected benefits.",Non-current liabilities
+Finance leases –A finance lease is a method of providing finance to an entity where effectively a leasing company (the lessor or owner) buys the asset for the user (the lessee or hirer) and transfers substantially all of the risks and rewards of ownership of the asset to the lessee against monthly or quarterly payments for a fixed period.,Non-current liabilities
+"Long-term bonds payables –The bond is a type of long-term debt that is usually issued by organizations like corporations, hospitals, and governments. The issuer makes a formal promise or an agreement to pay interest of bonds, usually semiannually, to pay the principal amount at an agreed date in the future.",Non-current liabilities
+"Long-term warranties – Some organizations give warranties as after-sales services to its customer to create a long and reliable relationship with them. These warranties, thus, are payable in more than one year, are classified as long-term.",Non-current liabilities
+"Long-term loans – Usually, businesses, to provide for their working capital, take long-term loans. The repayment of these loans is extended over a period of greater than one year.",Non-current liabilities
+See also  Original Issue Discount (OID) - What Is It? Example and Explanation. ,Non-current liabilities
+The financial liabilities can also be divided into two different categories based on their relation to market prices or rates. ,Non-current liabilities
+linked to market prices.,Non-current liabilities
+,Non-current liabilities

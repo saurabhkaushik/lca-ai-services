@@ -106,23 +106,19 @@ class Transformer_Classifier:
         #model = AutoModelForSequenceClassification.from_pretrained('./model/')
         return_value = {}
         sentences = processTxt.get_sentences(article_text)
+        e_index = 0
         for c_sentence in sentences:
             c_sentence = str(c_sentence)
             if len(c_sentence) > 0 and len(c_sentence) < 512:
                 results = self.predict(c_sentence, model)
                 score = (results[0]["score"]  * 100)
+                label = results[0]["label"]
                 score = risk_score.calculate_score(c_sentence, score)
-                try: 
-                    res = re.search(c_sentence, article_text) # TODO Revisite 
-                    if not res == None:
-                        stmt_index = str(res.start()) + "-" + str(res.end())
-                        relevence = score
-                        return_value[stmt_index] = {"start_index" : res.start(), "end_index" : res.end(), "relevence" : relevence}
-                except IndexError:
-                    print("IndexError")
-                except re.error:
-                    print("re.error")            
-
+                start_i, end_i = processTxt.search_sentence(c_sentence, article_text)
+                if start_i is not None:
+                    stmt_index = str(start_i) + "-" + str(end_i)
+                    return_value[stmt_index] = {"index" : e_index, "start_index" : start_i, "end_index" : end_i, "score" : score, "label" : label}
+                    e_index += 1
         return return_value
     
     def process_contract_training_data_eval(self):
@@ -160,38 +156,3 @@ class Transformer_Classifier:
         print("Confusion Matrix: \n", matrix)
         accry_score = accuracy_score(ref, pred)
         print("Accuracy Score: \n", accry_score*100, "%")
-
-'''
-        accuracy = evaluate.load("accuracy")
-        accuracy.add(references= ref, predictions=pred)
-        acc_result = accuracy.compute()
-        print ("Accuracy : ", acc_result)
-
-        clf_metrics = evaluate.combine(["accuracy", "f1", "precision", "recall"])
-        clf_results = clf_metrics.compute(references= ref, predictions=pred)
-        print ("CLF Results : ", clf_results)
-'''
-'''
-    def process_contract_training_data(self):
-        results = dbutil.get_contracts()
-        for row in results:
-            article_text = row["content"]
-            sentences = processTxt.get_sentences(article_text)
-            for c_sentence in sentences:
-                c_sentence = str(c_sentence)
-                if len(c_sentence) > 0 and len(c_sentence) < 512:
-                    try: 
-                        results = self.predict(c_sentence)
-                    except RuntimeError:
-                        print ("Tensor size issues.")
-                    else: 
-                        score = (results[0]["score"]  * 100)   
-                        score = risk_score.calculate_score(c_sentence, score)
-                        label = results[0]["label"]                    
-                        if score > 40:
-                            print ("Sentences : ", c_sentence, ", Result : ", label, ", Score : ", score)                   
-                            dbutil.save_training_data(c_sentence, label, "generated", "")
-        return 
-
-
-'''

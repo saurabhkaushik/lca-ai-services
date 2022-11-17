@@ -15,7 +15,7 @@ class Risk_Score_Service:
 
     def highlight_ranking(self, return_value):
         for r_key in return_value:
-            score = return_value[r_key]['relevence'] 
+            score = return_value[r_key]['score'] 
             if score > 30: 
                 return_value[r_key]["relevence_degree"] = "HIGH"
             else: 

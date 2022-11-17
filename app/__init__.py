@@ -37,15 +37,23 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     @apps.route('/classify_service', methods=('GET', 'POST'))
     def classify_service():  
         request_data = request.get_json() 
-        contract = request_data['content']
-        print("Contract Detail : ", contract)
-        if not contract: 
-            flash('contract is required!')
-            return
+        contract_id = request_data['id']
+        print("Contract Id : ", contract_id)
+        if not contract_id: 
+            flash('contract id is required!')
+            return None
+        results = dbutil.get_contracts_id(contract_id)
+        for rows in results:
+            contract_data = rows
+        print ('Contract : ', contract_data)
+        contract = contract_data['content']
         answer_results = class_service.process_contract_request(contract, model)
-        answer_results = score_service.highlight_ranking(answer_results)
-        print("Contract Analysis : ", answer_results)
-        return jsonify(answer_results)
+        response = score_service.highlight_ranking(answer_results)
+        
+        #dbutil.update_contracts_id(contract_id, contract_data['title'], contract, str(response))
+        json_response = jsonify(response)
+        print("Response : ", response)
+        return json_response
 
     @apps.route('/training_service', methods=('GET', 'POST'))
     def training_service():  
