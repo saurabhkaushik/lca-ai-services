@@ -43,9 +43,9 @@ class Transformer_Classifier:
 
         return encodings
 
-    def prepare_train_dataset(self):
+    def prepare_train_dataset(self, domain):
         processed_data = []
-        train_data = dbutil.get_training_data()
+        train_data = dbutil.get_training_data(domain)
 
         label_count = 0
         for row in train_data:
@@ -55,7 +55,7 @@ class Transformer_Classifier:
                 self.label_x.update({label_count: key})
                 label_count += 1
 
-        train_data = dbutil.get_training_data()
+        train_data = dbutil.get_training_data(domain)
         for row in train_data:
             processed_data.append(self.process_data(row))
 
@@ -71,12 +71,12 @@ class Transformer_Classifier:
         valid_hg = Dataset(pa.Table.from_pandas(valid_df))
         return train_hg, valid_hg
 
-    def load_model(self):
-        model = AutoModelForSequenceClassification.from_pretrained('./model/')
+    def load_model(self, domain):
+        model = AutoModelForSequenceClassification.from_pretrained('./model/' + domain + '/')
         return model
 
-    def training(self):
-        train_hg, valid_hg = self.prepare_train_dataset()
+    def training(self, domain):
+        train_hg, valid_hg = self.prepare_train_dataset(domain)
 
         training_args = TrainingArguments(
             output_dir="./result", evaluation_strategy="epoch")
@@ -97,7 +97,7 @@ class Transformer_Classifier:
         trainer.train()
         metrics = trainer.evaluate()
         print("Metrics : ", metrics)
-        model.save_pretrained('./model/')
+        model.save_pretrained('./model/'+ domain + '/')
         return model
 
     def predict(self, sentences, model):
@@ -107,7 +107,6 @@ class Transformer_Classifier:
         return results
 
     def process_contract_request(self, article_text, model):
-        #model = AutoModelForSequenceClassification.from_pretrained('./model/')
         return_value = {}
         sentences = processTxt.get_sentences(article_text)
         e_index = 0
@@ -126,9 +125,9 @@ class Transformer_Classifier:
                 e_index += 1
         return return_value
 
-    def process_contract_training_data_eval(self):
-        model = AutoModelForSequenceClassification.from_pretrained('./model/')
-        results = dbutil.get_training_data()
+    def process_contract_training_data_eval(self, domain):
+        model = self.load_model(domain)
+        results = dbutil.get_training_data(domain)
         batchupdate = []
         for row in results:
             article_text = row["content"]
@@ -144,11 +143,11 @@ class Transformer_Classifier:
         dbutil.update_training_data_batch(batchupdate)
         return
 
-    def evalute_model(self):
+    def evalute_model(self, domain):
         ref = []
         pred = []
 
-        results = dbutil.get_training_data()
+        results = dbutil.get_training_data(domain)
         for row in results:
             ref.append(row["label"].lower().strip())
             pred.append(row["eval_label"].lower().strip())

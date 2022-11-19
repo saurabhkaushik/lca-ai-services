@@ -25,8 +25,8 @@ class Risk_Score_Service:
         sent_score = sent_score * 100
         return sent_score
 
-    def get_keywords(self):
-        results = dbutil.get_seed_data()
+    def get_keywords(self, domain):
+        results = dbutil.get_seed_data(domain)
         keywords = []
         for row in results:
             keyws = row['keywords'].split(',')

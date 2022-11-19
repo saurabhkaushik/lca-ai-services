@@ -132,11 +132,11 @@ class MySQLUtility:
         return
 
     # Contracts CRUD
-    def get_contracts(self, page="true"):
+    def get_contracts(self, domain, page="true"):
         cnxn = self.get_connection()
         cursor = cnxn.cursor(dictionary=True)
 
-        uuid_query = "Select * from contract_data"
+        uuid_query = "Select * from contract_data" + " where domain=\'" + domain + '\';'
         cursor.execute(uuid_query)
         results = cursor.fetchall()
 
@@ -206,11 +206,11 @@ class MySQLUtility:
         return None
 
     # Learn DB CRUD
-    def get_seed_data(self):
+    def get_seed_data(self, domain):
         cnxn = self.get_connection()
         cursor = cnxn.cursor(dictionary=True)
 
-        uuid_query = "SELECT * from " + self.table_id2
+        uuid_query = "SELECT * from " + self.table_id2 + " where domain=\'" + domain + '\';'
         print('Query: ', uuid_query)
         cursor.execute(uuid_query)
         results = cursor.fetchall()
@@ -298,13 +298,13 @@ class MySQLUtility:
         return None
 
     # Training Data CRUD
-    def get_training_data(self, type="all"):
+    def get_training_data(self, domain, type="all"):
         cnxn = self.get_connection()
         cursor = cnxn.cursor(dictionary=True)
 
-        uuid_query = "SELECT * from " + self.table_id3
+        uuid_query = "SELECT * from " + self.table_id3 + " where domain=\'" + domain + '\';'
         if not type == "all":
-            uuid_query = "SELECT * from " + self.table_id3 + " where type=\'" + type + "\'"
+            uuid_query = "SELECT * from " + self.table_id3 + " where type=\'" + type + "\'" + " and domain=\'" + domain + '\';'
         print('Query: ', uuid_query)
         cursor.execute(uuid_query)
         results = cursor.fetchall()

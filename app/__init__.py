@@ -7,6 +7,7 @@ from app.Transformer_Classifier import Transformer_Classifier
 from app.MySQLUtility import MySQLUtility
 from app.Risk_Score_Service import Risk_Score_Service
 
+domains =['Liabilities', 'ESG']
 
 def create_app(config, debug=False, testing=False, config_overrides=None):
     apps = Flask(__name__)
@@ -18,7 +19,6 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     dbutil = MySQLUtility()
     score_service = Risk_Score_Service()
     class_service = Transformer_Classifier()
-    model = class_service.load_model()
 
     if config_overrides:
         apps.config.update(config_overrides)
@@ -38,6 +38,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     def classify_service():
         request_data = request.get_json()
         contract_id = request_data['id']
+        domain = request_data['domain']
         print("Contract Id : ", contract_id)
         if not contract_id:
             flash('contract id is required!')
@@ -45,8 +46,9 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         results = dbutil.get_contracts_id(contract_id)
         for rows in results:
             contract_data = rows
-        contract = contract_data['content']
+        contract = contract_data['content']       
         print('Contract : \n', contract)
+        model = class_service.load_model(domain)
         response = class_service.process_contract_request(contract, model)
         #dbutil.update_contracts_id(contract_id, contract_data['title'], contract, str(response))
         json_response = jsonify(response)
@@ -55,16 +57,17 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
 
     @apps.route('/training_service', methods=('GET', 'POST'))
     def training_service():
-        train_hg, valid_hg = class_service.prepare_train_dataset()
-        model = class_service.training(train_hg, valid_hg)
+        for domain in domains:
+            class_service.training(domain)
         return render_template('index.html')
 
     @apps.route('/test_service', methods=('GET', 'POST'))
     def test_service():
         contract = "This is a very legalised way of doing businesss."
+        domain = "Liabilities"
+        model = class_service.load_model(domain)
         answer_results = class_service.process_contract_request(
             contract, model)
-        answer_results = score_service.highlight_ranking(answer_results)
         print("Contract Analysis : ", answer_results)
         return jsonify(answer_results)
 

@@ -27,8 +27,8 @@ class TextRank_Extractor:
             set(keyword), key=lambda x: keyword.count(x), reverse=True)
         return res
 
-    def extract_keyword_seed_data(self):
-        results = dbutil.get_seed_data()
+    def extract_keyword_seed_data(self, domain):
+        results = dbutil.get_seed_data(domain)
         batch_update = []
         for row in results:
             content = row['content']
