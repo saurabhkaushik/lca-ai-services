@@ -20,6 +20,7 @@ dbutil = MySQLUtility()
 risk_score = Risk_Score_Service()
 processTxt = PreProcessText()
 
+
 class Transformer_Classifier:
     label_y = dict()
     label_x = dict()
@@ -32,7 +33,8 @@ class Transformer_Classifier:
         text = str(text)
         text = ' '.join(text.split())
 
-        encodings = tokenizer(text, padding="max_length", truncation=True, max_length=128)
+        encodings = tokenizer(text, padding="max_length",
+                              truncation=True, max_length=128)
 
         label = self.label_y[row['label'].lower().strip()]
 
@@ -41,22 +43,22 @@ class Transformer_Classifier:
 
         return encodings
 
-    def prepare_train_dataset(self): 
-        processed_data = []    
+    def prepare_train_dataset(self):
+        processed_data = []
         train_data = dbutil.get_training_data()
-        
+
         label_count = 0
-        for row in train_data:        
+        for row in train_data:
             key = row["label"].lower().strip()
             if not key in self.label_y.keys():
-                self.label_y.update({key : label_count})
-                self.label_x.update({label_count : key})
+                self.label_y.update({key: label_count})
+                self.label_x.update({label_count: key})
                 label_count += 1
-        
+
         train_data = dbutil.get_training_data()
-        for row in train_data:  
+        for row in train_data:
             processed_data.append(self.process_data(row))
-            
+
         new_df = pd.DataFrame(processed_data)
 
         train_df, valid_df = train_test_split(
@@ -75,14 +77,15 @@ class Transformer_Classifier:
 
     def training(self):
         train_hg, valid_hg = self.prepare_train_dataset()
-        
-        training_args = TrainingArguments(output_dir="./result", evaluation_strategy="epoch")
+
+        training_args = TrainingArguments(
+            output_dir="./result", evaluation_strategy="epoch")
         id2label = self.label_x
         label2id = {val: key for key, val in id2label.items()}
         num_labels = len(id2label)
 
         model = AutoModelForSequenceClassification.from_pretrained(
-            model_checkpoint, num_labels=num_labels, id2label=id2label, label2id=label2id)  
+            model_checkpoint, num_labels=num_labels, id2label=id2label, label2id=label2id)
 
         trainer = Trainer(
             model=model,
@@ -93,34 +96,36 @@ class Transformer_Classifier:
         )
         trainer.train()
         metrics = trainer.evaluate()
-        print ("Metrics : ", metrics)
+        print("Metrics : ", metrics)
         model.save_pretrained('./model/')
         return model
 
-    def predict(self, sentences, model): 
-        classifier = pipeline("text-classification", model=model, tokenizer=tokenizer)
+    def predict(self, sentences, model):
+        classifier = pipeline("text-classification",
+                              model=model, tokenizer=tokenizer)
         results = classifier(sentences)
-        return results 
+        return results
 
     def process_contract_request(self, article_text, model):
         #model = AutoModelForSequenceClassification.from_pretrained('./model/')
         return_value = {}
         sentences = processTxt.get_sentences(article_text)
         e_index = 0
-        for c_sentence in sentences:
-            c_sentence = str(c_sentence)
+        for sents in sentences:
+            c_sentence = sents['sentance']
+            start_i = sents['start']
+            end_i = sents['end']
             if len(c_sentence) > 0 and len(c_sentence) < 512:
                 results = self.predict(c_sentence, model)
-                score = (results[0]["score"]  * 100)
                 label = results[0]["label"]
-                score = risk_score.calculate_score(c_sentence, score)
-                start_i, end_i = processTxt.search_sentence(c_sentence, article_text)
-                if start_i is not None:
-                    stmt_index = str(start_i) + "-" + str(end_i)
-                    return_value[stmt_index] = {"index" : e_index, "start_index" : start_i, "end_index" : end_i, "score" : score, "label" : label}
-                    e_index += 1
+                p_score = (results[0]["score"] * 100)
+                s_score = risk_score.get_sentiment_score(c_sentence)
+                c_score = risk_score.get_semantic_score(c_sentence)
+                return_value[e_index] = {"start_index": start_i, "end_index": end_i,
+                                         "p_score": p_score, "s_score": s_score, "c_score": c_score, "label": label}
+                e_index += 1
         return return_value
-    
+
     def process_contract_training_data_eval(self):
         model = AutoModelForSequenceClassification.from_pretrained('./model/')
         results = dbutil.get_training_data()
@@ -130,28 +135,27 @@ class Transformer_Classifier:
             score_2 = row['score']
             if article_text != None and len(article_text) > 0 and len(article_text) < 512:
                 results = self.predict(article_text, model)
-                score = (results[0]["score"]  * 100) 
-                score = risk_score.calculate_score(article_text, score)
-                label = results[0]["label"] 
-                single_d = {"id": row['id'], "score" : score_2, "eval_label":label, "eval_score":score}
-                #print ("Updated Statements : ", article_text, label, score)
+                score = (results[0]["score"] * 100)
+                label = results[0]["label"]
+                single_d = {"id": row['id'], "score": score_2,
+                            "eval_label": label, "eval_score": score}
                 batchupdate.append(single_d)
-        print (len(batchupdate))
+        print(len(batchupdate))
         dbutil.update_training_data_batch(batchupdate)
-        return 
+        return
 
     def evalute_model(self):
         ref = []
         pred = []
-        
-        results = dbutil.get_training_data()        
+
+        results = dbutil.get_training_data()
         for row in results:
             ref.append(row["label"].lower().strip())
             pred.append(row["eval_label"].lower().strip())
         #print ("Ref: ", ref)
         #print ("Pred", pred)
         report = classification_report(ref, pred)
-        print ("Classification Report : \n", report)
+        print("Classification Report : \n", report)
         matrix = confusion_matrix(ref, pred)
         print("Confusion Matrix: \n", matrix)
         accry_score = accuracy_score(ref, pred)

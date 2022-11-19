@@ -10,3 +10,4 @@ datasets
 scikit-learn
 mysql-connector-python
 nltk
+waitress

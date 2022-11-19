@@ -1,17 +1,18 @@
 import pytextrank
 import pandas as pd
-import spacy 
+import spacy
 from app.MySQLUtility import MySQLUtility
 from app.PreProcessText import PreProcessText
 
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_md")
 nlp.add_pipe("textrank")
 pre_process = PreProcessText()
-dbutil = MySQLUtility()    
+dbutil = MySQLUtility()
 
-class TextRank_Extractor: 
+
+class TextRank_Extractor:
     def __init__(self) -> None:
-        pass 
+        pass
 
     def text_rank(self, text):
         doc = nlp(text)
@@ -20,26 +21,27 @@ class TextRank_Extractor:
             str_key = pre_process.token_words(text=phrase.text)
             stringkeyword = " ".join(str_key)
             if len(stringkeyword) > 0:
+                stringkeyword = pre_process.preprocess_text(stringkeyword)
                 keyword.append(stringkeyword.lower().strip())
-        res = sorted(set(keyword), key = lambda x: keyword.count(x), reverse=True)
+        res = sorted(
+            set(keyword), key=lambda x: keyword.count(x), reverse=True)
         return res
 
-    def extract_keyword_seed_data(self):            
+    def extract_keyword_seed_data(self):
         results = dbutil.get_seed_data()
         batch_update = []
-        for row in results: 
-            content = row['content'] 
+        for row in results:
+            content = row['content']
             id = row['id']
-            if content != None and len(content) > 1: 
+            if content != None and len(content) > 1:
                 sentences = pre_process.get_sentences(content)
-                for stmt in sentences: 
-                    stmt = str (stmt)
-                    if len(stmt) > 0:   
-                        keywords =  self.text_rank(stmt)
-                        keywords = ", ".join(keywords)  
-                        keywords = pre_process.preprocess_text(keywords)
-                        if len (keywords) > 3:
-                            query_json = {"id": id, "keywords":keywords}  
+                for stmt in sentences:
+                    stmt = str(stmt)
+                    if len(stmt) > 0:
+                        keywords = self.text_rank(stmt)
+                        keywords = ", ".join(keywords)
+                        if len(keywords) > 3:
+                            query_json = {"id": id, "keywords": keywords}
                             batch_update.append(query_json)
 
         dbutil.update_seed_data_batch(batch_update)

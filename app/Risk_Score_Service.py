@@ -1,45 +1,34 @@
-from app.MySQLUtility import MySQLUtility
-import spacy 
-from nltk.stem import WordNetLemmatizer
-  
-lemmatizer = WordNetLemmatizer()
-nlp = spacy.load('en_core_web_sm')
-dbutil = MySQLUtility()
 from transformers import pipeline
-sentiment_pipeline = pipeline("sentiment-analysis", model = "distilbert-base-uncased-finetuned-sst-2-english")
+from app.MySQLUtility import MySQLUtility
+import spacy
+from nltk.stem import WordNetLemmatizer
+
+lemmatizer = WordNetLemmatizer()
+nlp = spacy.load('en_core_web_md')  # en_core_web_lg / en_core_web_md /
+
+dbutil = MySQLUtility()
+sentiment_pipeline = pipeline(
+    "sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+
 
 class Risk_Score_Service:
 
     def __init__(self) -> None:
         pass
 
-    def highlight_ranking(self, return_value):
-        for r_key in return_value:
-            score = return_value[r_key]['score'] 
-            if score > 30: 
-                return_value[r_key]["relevence_degree"] = "HIGH"
-            else: 
-                if score >= -30 and score <= 30: 
-                    return_value[r_key]["relevence_degree"] = "MEDIUM"
-                else:
-                    if score < -30: 
-                        return_value[r_key]["relevence_degree"] = "LOW"
-        return return_value
-
-    def calculate_score(self, sentence, score):
-        data = [sentence] 
+    def get_sentiment_score(self, sentence):
+        data = [sentence]
         sent_result = sentiment_pipeline(data)
         #print (sent_result)
-        sent_score = (sent_result[0]['score']) if sent_result[0]['label'] == 'POSITIVE' else -(sent_result[0]['score'])
+        sent_score = (
+            sent_result[0]['score']) if sent_result[0]['label'] == 'POSITIVE' else -(sent_result[0]['score'])
         sent_score = sent_score * 100
-        adj_score = (sent_score * score) / 100
-        #print(' Original Score: ', score, ' Sentiment Score: ', sent_score >> ' Adjusted Score: ', adj_score)
-        return adj_score
+        return sent_score
 
     def get_keywords(self):
         results = dbutil.get_seed_data()
         keywords = []
-        for row in results:   
+        for row in results:
             keyws = row['keywords'].split(',')
             for kwyw in keyws:
                 kw = kwyw.split()
@@ -47,7 +36,28 @@ class Risk_Score_Service:
                 for k in kw:
                     str_k += lemmatizer.lemmatize(k) + ' '
                 keywords.append(str_k.strip())
-        keywords = sorted(set(keywords), key = lambda x: keywords.count(x), reverse=True)
+        keywords = sorted(
+            set(keywords), key=lambda x: keywords.count(x), reverse=True)
         return keywords
 
+    def get_semantic_score(self, sentence):
+        score = 0
+        doc = nlp(sentence)
+        for token in doc:
+            if (token.pos_ == "ADJ" or token.pos_ == "VERB") and (not token.is_stop):
+                doc1 = nlp(token.text)
+                doc2 = nlp("positive")
+                doc3 = nlp("negative")
+                d_positive = doc1.similarity(doc2)
+                d_negative = doc1.similarity(doc3)
 
+                diff_d = abs(d_positive - d_negative)
+                if diff_d > 0.01:
+                    score += 1
+                else:
+                    score -= 1
+        if score >= 0:
+            s_score = 100.0
+        else:
+            s_score = -100.0
+        return s_score

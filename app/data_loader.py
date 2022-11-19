@@ -1,8 +1,8 @@
 from app.MySQLUtility import MySQLUtility
 from app.TextRank_Extractor import TextRank_Extractor
-import json 
+import json
 import csv
-import os 
+import os
 from app.PreProcessText import PreProcessText
 
 processTxt = PreProcessText()
@@ -11,62 +11,66 @@ cuda_data_file = './cuad-data/CUAD/CUADv1.json'
 reports_folder = './cuad-data/reports/'
 seed_data_file = './cuad-data/seed_data.csv'
 
-class Data_Loader: 
+
+class Data_Loader:
     def __init__(self) -> None:
         pass
 
-    def import_reports_contract_data(self):    
-        filelist = os.listdir(reports_folder)   
-        batch_insert = []    
+    def import_reports_contract_data(self):
+        filelist = os.listdir(reports_folder)
+        batch_insert = []
 
-        for file_name in filelist:  
+        for file_name in filelist:
             if file_name.endswith(".txt"):
                 print("Working with ", file_name)
-                with open(reports_folder + file_name, encoding= "ISO-8859-1") as report_file:
+                with open(reports_folder + file_name, encoding="ISO-8859-1") as report_file:
                     filestr = report_file.read()
                     if len(filestr) > 10:
-                        insert_json =  {"title" : file_name, "content" : filestr,  "type" : "curated", "response" : "", "domain" : "liability", "userid" : "admin"}               
+                        insert_json = {"title": file_name, "content": filestr,  "type": "curated",
+                                       "response": "", "domain": "liability", "userid": "admin"}
                         batch_insert.append(insert_json)
                 report_file.close()
         dbutil.save_contracts_batch(batch_insert)
         return None
 
-    def import_seed_data_batch(self):  
-        text_rank = TextRank_Extractor()  
-        batch_insert = []    
+    def import_seed_data_batch(self):
+        text_rank = TextRank_Extractor()
+        batch_insert = []
         with open(seed_data_file, newline='', encoding='utf-8') as csvfile:
             seedreader = csv.reader(csvfile)
             line_count = 0
             for row in seedreader:
                 if line_count > 0:
-                    keywords =  text_rank.text_rank(row[0].rstrip()) 
-                    keywords = ", ".join(keywords).rstrip().lower().strip()  
+                    keywords = text_rank.text_rank(row[0].rstrip())
+                    keywords = ", ".join(keywords).rstrip().lower().strip()
                     label = row[1].rstrip().lower().strip()
                     content = row[0].rstrip()
                     if len(content) > 3:
-                        insert_json = {"keywords" : keywords, "content" : content, "label" : label, "type" : 'curated', "domain" : 'liability', "userid" : 'admin'}
+                        insert_json = {"keywords": keywords, "content": content, "label": label,
+                                       "type": 'curated', "domain": 'liability', "userid": 'admin'}
                         batch_insert.append(insert_json)
 
                 line_count += 1
         dbutil.save_seed_data_batch(batch_insert)
         csvfile.close()
-    
+
     def load_seed_to_training_data_batch(self):
-        batch_insert = []    
+        batch_insert = []
 
         results = dbutil.get_seed_data()
-        for row in results: 
-            content = row['content']   
-            label = row['label']            
-            if content != None and len(content) > 0: 
+        for row in results:
+            content = row['content']
+            label = row['label']
+            if content != None and len(content) > 0:
                 sentences = processTxt.get_sentences(content)
-                #sentences = re.split(r' *[\.\?!][\'"\)\]]* *', content) 
-                for sentence in sentences: 
+                #sentences = re.split(r' *[\.\?!][\'"\)\]]* *', content)
+                for sentence in sentences:
                     sentence = str(sentence)
                     sentence = processTxt.clean_text(sentence)
-                    if len(sentence) > 4:   
+                    if len(sentence) > 4:
                         #print (">> Statements : ", sentence, " Label: ", label)
-                        insert_json = {"content" : sentence, "type" : "seed", "label" : label, "eval_label" : '', "score" : 0, "eval_score" : 0, "domain" : "liability", "userid" : "admin"}
+                        insert_json = {"content": sentence, "type": "seed", "label": label, "eval_label": '',
+                                       "score": 0, "eval_score": 0, "domain": "liability", "userid": "admin"}
                         batch_insert.append(insert_json)
         dbutil.save_training_data_batch(batch_insert)
         return
@@ -96,7 +100,6 @@ class Data_Loader:
                     print(line.rstrip())
                     self.dbutil.save_learndb("", line.rstrip())
     '''
-
 
     ''' 
     def load_train_data(self):
@@ -142,7 +145,6 @@ class Data_Loader:
                             dbutil.save_training_data(catch_stmt["sentence"], catch_stmt["label"], "seed", "")
         return
     '''
-
 
     ''' 
     def seed_training_corpus_similarity(self):
