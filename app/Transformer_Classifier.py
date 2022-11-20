@@ -151,11 +151,13 @@ class Transformer_Classifier:
         for row in results:
             ref.append(row["label"].lower().strip())
             pred.append(row["eval_label"].lower().strip())
-        #print ("Ref: ", ref)
-        #print ("Pred", pred)
-        report = classification_report(ref, pred)
-        print("Classification Report : \n", report)
-        matrix = confusion_matrix(ref, pred)
-        print("Confusion Matrix: \n", matrix)
-        accry_score = accuracy_score(ref, pred)
-        print("Accuracy Score: \n", accry_score*100, "%")
+        try:
+            report = classification_report(ref, pred)
+            print("Classification Report : \n", report)
+            matrix = confusion_matrix(ref, pred)
+            print("Confusion Matrix: \n", matrix)
+            accry_score = accuracy_score(ref, pred)
+            print("Accuracy Score: \n", accry_score*100, "%")
+        except:
+            print()
+

@@ -7,7 +7,7 @@ from app.PreProcessText import PreProcessText
 
 processTxt = PreProcessText()
 dbutil = MySQLUtility()
-domains =['Liabilities', 'ESG']
+domains =['liabilities', 'esg']
 data_folder = './data/'
 
 class Data_Loader:
@@ -47,6 +47,7 @@ class Data_Loader:
                             keywords = text_rank.text_rank(row[0].rstrip())
                             keywords = ", ".join(keywords).rstrip().lower().strip()
                             label = row[1].rstrip().lower().strip()
+                            domain = row[2].rstrip().lower().strip()
                             content = row[0].rstrip()
                             if len(content) > 3:
                                 insert_json = {"keywords": keywords, "content": content, "label": label,
@@ -70,7 +71,7 @@ class Data_Loader:
                 sentences = processTxt.get_sentences(content)
                 #sentences = re.split(r' *[\.\?!][\'"\)\]]* *', content)
                 for sentence in sentences:
-                    sentence = str(sentence)
+                    sentence = str(sentence['sentance'])
                     sentence = processTxt.clean_text(sentence)
                     if len(sentence) > 4:
                         #print (">> Statements : ", sentence, " Label: ", label)

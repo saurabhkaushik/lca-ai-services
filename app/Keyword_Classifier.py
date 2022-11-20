@@ -10,7 +10,6 @@ from app.PreProcessText import PreProcessText
 from app.Risk_Score_Service import Risk_Score_Service
 
 # load the dataset
-labels, texts = [], []
 pre_process = PreProcessText()
 risk_score = Risk_Score_Service()
 dbutil = MySQLUtility()
@@ -23,6 +22,7 @@ class Keyword_Classifier:
     text_clf = ""
 
     def prepare_training_data(self, domain):
+        labels, texts = [], []
         results = dbutil.get_seed_data(domain)
         for row in results:
             keywords = row['keywords']
@@ -34,6 +34,7 @@ class Keyword_Classifier:
         self.trainDF = pd.DataFrame()
         self.trainDF['text'] = texts
         self.trainDF['label'] = labels
+        print (self.trainDF['label'])
 
     def train_model(self, domain):
         self.text_clf = Pipeline([('vect', CountVectorizer(stop_words='english')),
@@ -43,21 +44,27 @@ class Keyword_Classifier:
             self.trainDF['text'], self.trainDF['label'])
 
         dump(self.text_clf, './model/' + domain + '/keyword_class.joblib')
+        #print (self.trainDF['label'])
         return
 
     def evaluate_model(self, domain):
-        self.prepare_training_data()
+        self.prepare_training_data(domain)
         self.text_clf = load('./model/' + domain + '/keyword_class.joblib')
 
         predicted = self.text_clf.predict(self.trainDF['text'])
 
         y_labels = self.trainDF['label'].to_numpy()
-        report = classification_report(y_labels, predicted)
-        print("Classification Report : \n", report)
-        matrix = confusion_matrix(y_labels, predicted)
-        print("Confusion Matrix: \n", matrix)
-        acc_score = accuracy_score(y_labels, predicted)
-        print("Accuracy Score: \n", acc_score*100, "%")
+        #print ('Labels', y_labels)
+        #print ('Predicted', predicted)
+        try:
+            report = classification_report(y_labels, predicted)
+            print("Classification Report : \n", report)
+            matrix = confusion_matrix(y_labels, predicted)
+            print("Confusion Matrix: \n", matrix)
+            acc_score = accuracy_score(y_labels, predicted)
+            print("Accuracy Score: \n", acc_score*100, "%")
+        except:
+            print()
 
     def predict_text_data(self, text, domain):
         self.text_clf = load('./model/' + domain + '/keyword_class.joblib')
@@ -79,7 +86,7 @@ class Keyword_Classifier:
             print("Filename:", row["title"])
             sentences = pre_process.get_sentences(article_text)
             for c_sentence in sentences:
-                c_sentence = str(c_sentence)
+                c_sentence = str(c_sentence['sentance'])
                 c_sentence = pre_process.clean_text(c_sentence)
                 if len(c_sentence) > 4:
                     predict_label, predict_prb = self.predict_text_data(
@@ -109,7 +116,7 @@ class Keyword_Classifier:
 
             sentences = pre_process.get_sentences(article_text)
             for c_sentence in sentences:
-                c_sentence = str(c_sentence)
+                c_sentence = str(c_sentence['sentance'])
                 if c_sentence != None and len(c_sentence) > 4:
                     predict_label, predict_prb = self.predict_text_data(
                         c_sentence)

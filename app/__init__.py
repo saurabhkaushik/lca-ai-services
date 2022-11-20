@@ -7,7 +7,7 @@ from app.Transformer_Classifier import Transformer_Classifier
 from app.MySQLUtility import MySQLUtility
 from app.Risk_Score_Service import Risk_Score_Service
 
-domains =['Liabilities', 'ESG']
+domains =['liabilities', 'esg']
 
 def create_app(config, debug=False, testing=False, config_overrides=None):
     apps = Flask(__name__)
@@ -29,7 +29,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
 
     logging.getLogger().setLevel(logging.INFO)
 
-    @apps.route('/')
+    @apps.route('/')  
     def index():
         posts = ""
         return render_template('index.html', posts=posts)

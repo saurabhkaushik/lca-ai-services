@@ -36,12 +36,11 @@ class TextRank_Extractor:
             if content != None and len(content) > 1:
                 sentences = pre_process.get_sentences(content)
                 for stmt in sentences:
-                    stmt = str(stmt)
+                    stmt = str(stmt['sentance'])
                     if len(stmt) > 0:
                         keywords = self.text_rank(stmt)
                         keywords = ", ".join(keywords)
                         if len(keywords) > 3:
                             query_json = {"id": id, "keywords": keywords}
                             batch_update.append(query_json)
-
         dbutil.update_seed_data_batch(batch_update)

@@ -76,7 +76,7 @@ class PreProcessText(object):
         return rem_num
 
     def get_sentences(self, article_text):
-        print('Get Sentence: \n')
+        #print('Get Sentence: \n')
         sentences = re.split(r' *[\.\?!][\'"\)\]]* *', article_text)
         sent_list = []
         start = 0
@@ -87,7 +87,7 @@ class PreProcessText(object):
                 'sentance': article_text[start:end], 'start': start, 'end': end}
             sent_list.append(json_sent)
             start = end + 1
-        print(sent_list)
+        #print(sent_list)
         return sent_list
 
     def get_sentences_old(self, article_text):
