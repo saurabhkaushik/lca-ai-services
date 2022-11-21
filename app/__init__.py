@@ -1,19 +1,23 @@
 import logging
+import os
+
 from flask import Flask, render_template, request, url_for, flash, redirect
 from werkzeug.exceptions import abort
 from flask import make_response, jsonify
-
 from app.Transformer_Classifier import Transformer_Classifier
 from app.MySQLUtility import MySQLUtility
 from app.Risk_Score_Service import Risk_Score_Service
 
-domains =['liabilities', 'esg']
-
 def create_app(config, debug=False, testing=False, config_overrides=None):
     apps = Flask(__name__)
-    apps.config.from_object(config)
+    apps.config.from_object(config.DevelopmentConfig)
     apps.debug = debug
     apps.testing = testing
+
+    domains = apps.config['DOMAINS']
+    google_cert_key = apps.config['GOOGLE_CERT_KEY']
+
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_cert_key
 
     # dbutil.create_database()
     dbutil = MySQLUtility()

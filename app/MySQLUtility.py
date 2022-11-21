@@ -1,12 +1,9 @@
-import datetime
-import os
 import uuid
 from mysql.connector import pooling
 
 import mysql.connector
 from mysql.connector.constants import ClientFlag
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = './store/genuine-wording-key.json'
 
 config2 = {
     'user': 'root',

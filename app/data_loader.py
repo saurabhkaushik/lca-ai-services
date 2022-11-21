@@ -7,7 +7,6 @@ from app.PreProcessText import PreProcessText
 
 processTxt = PreProcessText()
 dbutil = MySQLUtility()
-domains =['liabilities', 'esg']
 data_folder = './data/'
 
 class Data_Loader:

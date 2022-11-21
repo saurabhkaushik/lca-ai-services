@@ -13,7 +13,6 @@ nlp = spacy.load('en_core_web_md')
 
 # Text Processing Class
 
-
 class PreProcessText(object):
     def __init__(self):
         pass

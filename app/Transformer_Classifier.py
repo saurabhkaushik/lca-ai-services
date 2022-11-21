@@ -1,5 +1,3 @@
-import re
-
 import pandas as pd
 import pyarrow as pa
 from datasets import Dataset
