@@ -74,18 +74,34 @@ class PreProcessText(object):
         #print("Cleaner Text: ", article_text, rem_num)
         return rem_num
 
+    def clean_input_text(self, text): 
+        #text = text.replace("@#$%^&*()[]\r\n`~-=_+", "") # @#$%^&*()[]{};:/<>\|`~-=_+
+        #text = text.replace('\n','')
+        #text = text.replace('\r', '')
+        '''escaped = text.translate(str.maketrans({"'":  r"\'",
+                                          "\"":  r"\"",
+                                          "^":  r"\^",
+                                          "$":  r"\$",
+                                          "*":  r"\*"}))'''
+
+        return text
+
     def get_sentences(self, article_text):
-        #print('Get Sentence: \n')
         sentences = re.split(r' *[\.\?!][\'"\)\]]* *', article_text)
         sent_list = []
         start = 0
         end = 0
-        for sent in sentences:
-            end = start + len(sent) + 1
+        for sent in sentences:                  
+            end = start + len(sent) + 1    
+            trailing_space = len(article_text[start:end]) - len(article_text[start:end].lstrip()) 
+            start += trailing_space
+            end += trailing_space       
+            #print('Sent:', repr(sent), (len(sent)+1))
+            #print('Article:', repr(article_text[start:end]), len(article_text[start:end]), start, end)
             json_sent = {
                 'sentance': article_text[start:end], 'start': start, 'end': end}
             sent_list.append(json_sent)
-            start = end + 1
+            start = end 
         #print(sent_list)
         return sent_list
 

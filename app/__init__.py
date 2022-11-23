@@ -7,6 +7,7 @@ from flask import make_response, jsonify
 from app.Transformer_Classifier import Transformer_Classifier
 from app.MySQLUtility import MySQLUtility
 from app.Risk_Score_Service import Risk_Score_Service
+from app.PreProcessText import PreProcessText
 
 def create_app(config, debug=False, testing=False, config_overrides=None):
     apps = Flask(__name__)
@@ -23,6 +24,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     dbutil = MySQLUtility()
     score_service = Risk_Score_Service()
     class_service = Transformer_Classifier()
+    preprocess = PreProcessText()
 
     if config_overrides:
         apps.config.update(config_overrides)
@@ -50,7 +52,8 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         results = dbutil.get_contracts_id(contract_id)
         for rows in results:
             contract_data = rows
-        contract = contract_data['content']       
+        contract = contract_data['content'] 
+        #contract = preprocess.clean_input_text(contract)    
         print('Contract : \n', contract)
         model = class_service.load_model(domain)
         response = class_service.process_contract_request(contract, model)
