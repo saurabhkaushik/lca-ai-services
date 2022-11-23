@@ -1,9 +1,9 @@
 import uuid
 from mysql.connector import pooling
+import datetime
 
 import mysql.connector
 from mysql.connector.constants import ClientFlag
-
 
 config2 = {
     'user': 'root',
@@ -135,6 +135,8 @@ class MySQLUtility:
 
         uuid_query = "Select * from contract_data" + " where domain=\'" + domain + '\';'
         cursor.execute(uuid_query)
+        print(cursor.statement)
+
         results = cursor.fetchall()
 
         cnxn.close()
@@ -146,6 +148,8 @@ class MySQLUtility:
 
         uuid_query = "Select * from contract_data where id =\"" + id + "\""
         cursor.execute(uuid_query)
+        print(cursor.statement)
+
         results = cursor.fetchall()
 
         cnxn.close()
@@ -162,11 +166,14 @@ class MySQLUtility:
             uu_id = str(uuid.uuid4())
             title = row['title']
             content = row['content']
-            insert_str = (uu_id, "2022-01-01 01:01", title, content,
+            now = datetime.datetime.utcnow()
+            formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
+            insert_str = (uu_id, formatted_date, title, content,
                           row['type'], row['response'], row['domain'], row['userid'])
             rows_to_insert.append(insert_str)
 
         cursor.executemany(insert_stmt, rows_to_insert)
+        print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -181,8 +188,8 @@ class MySQLUtility:
             " SET response = %s, title = %s, content = %s where id = %s;"
         val = (response, title, content, id)
 
-        print('Query: ', uuid_query)
         cursor.execute(uuid_query, val)
+        print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -194,8 +201,8 @@ class MySQLUtility:
         cursor = cnxn.cursor()
 
         uuid_query = "Delete from " + self.table_id1 + " where id = \'" + id + "\'"
-        print('Query: ', uuid_query)
         cursor.execute(uuid_query)
+        print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -208,9 +215,9 @@ class MySQLUtility:
         cursor = cnxn.cursor(dictionary=True)
 
         uuid_query = "SELECT * from " + self.table_id2 + " where domain=\'" + domain + '\';'
-        print('Query: ', uuid_query)
         cursor.execute(uuid_query)
         results = cursor.fetchall()
+        print(cursor.statement)
 
         cnxn.close()
         return results
@@ -220,9 +227,9 @@ class MySQLUtility:
         cursor = cnxn.cursor(dictionary=True)
 
         uuid_query = "SELECT * from " + self.table_id2 + " where id = \'" + id + "\'"
-        print('Query: ', uuid_query)
         cursor.execute(uuid_query)
         results = cursor.fetchall()
+        print(cursor.statement)
 
         cnxn.close()
         return results
@@ -236,11 +243,14 @@ class MySQLUtility:
                        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s);")
         for row in batch_data:
             uu_id = str(uuid.uuid4())
-            insert_set = (uu_id, "2022-01-01 01:01",
+            now = datetime.datetime.utcnow()
+            formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
+            insert_set = (uu_id, formatted_date,
                           row['keywords'], row['content'], row['type'], row['label'], row['domain'], row['userid'])
             rows_to_insert.append(insert_set)
 
         cursor.executemany(insert_stmt, rows_to_insert)
+        print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -253,9 +263,8 @@ class MySQLUtility:
 
         uuid_query = "UPDATE " + self.table_id2 + " SET keywords = %s where id = %s;"
         val = (keywords, id)
-        print('Query: ', uuid_query)
-
         cursor.execute(uuid_query, val)
+        print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -273,8 +282,8 @@ class MySQLUtility:
             insert_stmt = (row['keywords'], row['id'])
             rows_to_insert.append(insert_stmt)
 
-        print('Query: ', rows_to_insert)
         cursor.executemany(uuid_query, rows_to_insert)
+        print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -286,8 +295,8 @@ class MySQLUtility:
         cursor = cnxn.cursor()
 
         uuid_query = "Delete from " + self.table_id2 + " where id = \'" + id + "\'"
-        print('Query: ', uuid_query)
         cursor.execute(uuid_query)
+        print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -304,6 +313,8 @@ class MySQLUtility:
             uuid_query = "SELECT * from " + self.table_id3 + " where type=\'" + type + "\'" + " and domain=\'" + domain + '\';'
         print('Query: ', uuid_query)
         cursor.execute(uuid_query)
+        print(cursor.statement)
+
         results = cursor.fetchall()
 
         cnxn.close()
@@ -314,8 +325,9 @@ class MySQLUtility:
         cursor = cnxn.cursor(dictionary=True)
 
         uuid_query = "SELECT * from " + self.table_id3 + " where id = \'" + id + "\'"
-        print('Query: ', uuid_query)
         cursor.execute(uuid_query)
+        print(cursor.statement)
+
         results = cursor.fetchall()
 
         cnxn.close()
@@ -330,11 +342,14 @@ class MySQLUtility:
                        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
         for row in batch_data:
             uu_id = str(uuid.uuid4())
-            insert_set = (uu_id, "2022-01-01 01:01", row['content'], row['type'], row['label'], row['eval_label'], int(
+            now = datetime.datetime.utcnow()
+            formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
+            insert_set = (uu_id, formatted_date, row['content'], row['type'], row['label'], row['eval_label'], int(
                 row['score']), int(row['eval_score']), row['domain'], row['userid'])
             rows_to_insert.append(insert_set)
 
         cursor.executemany(insert_stmt, rows_to_insert)
+        print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -355,6 +370,7 @@ class MySQLUtility:
                            row['eval_score'], row['id'])
             rows_to_insert.append(insert_stmt)
         cursor.executemany(uuid_query, rows_to_insert)
+        print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -369,8 +385,8 @@ class MySQLUtility:
         cursor = cnxn.cursor()
 
         uuid_query = "Delete from " + self.table_id3 + " where id = \'" + id + "\'"
-        print('Query: ', uuid_query)
         cursor.execute(uuid_query)
+        print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
