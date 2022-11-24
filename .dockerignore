@@ -4,6 +4,7 @@
 **/.dockerignore
 **/.env
 **/.git
+**/.github
 **/.gitignore
 **/.project
 **/.settings
@@ -24,3 +25,5 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 README.md
+result
+env

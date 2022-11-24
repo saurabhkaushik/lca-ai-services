@@ -6,11 +6,12 @@ import os
 from app.PreProcessText import PreProcessText
 
 processTxt = PreProcessText()
-dbutil = MySQLUtility()
 data_folder = './data/'
 
-class Data_Loader:
-    def __init__(self) -> None:
+class Data_Loader(object):
+    dbutil = None 
+    def __init__(self, dbutil):
+        self.dbutil = dbutil
         pass
 
     def import_reports_contract_data(self, domain):
@@ -27,11 +28,11 @@ class Data_Loader:
                                     "response": "", "domain": domain, "userid": "admin"}
                         batch_insert.append(insert_json)
                 report_file.close()
-        dbutil.save_contracts_batch(batch_insert)
+        self.dbutil.save_contracts_batch(batch_insert)
         return None
 
     def import_seed_data_batch(self, domain):
-        text_rank = TextRank_Extractor()
+        text_rank = TextRank_Extractor(self.dbutil)
         batch_insert = []
         seed_folder = data_folder + domain + '/'
         filelist = os.listdir(seed_folder)
@@ -54,14 +55,14 @@ class Data_Loader:
                                 batch_insert.append(insert_json)
 
                         line_count += 1
-                dbutil.save_seed_data_batch(batch_insert)
+                self.dbutil.save_seed_data_batch(batch_insert)
                 csvfile.close()
         return None 
 
     def load_seed_to_training_data_batch(self, domain):
         batch_insert = []
 
-        results = dbutil.get_seed_data(domain)
+        results = self.dbutil.get_seed_data(domain)
         for row in results:
             content = row['content']
             label = row['label']
@@ -77,7 +78,7 @@ class Data_Loader:
                         insert_json = {"content": sentence, "type": "seed", "label": label, "eval_label": '',
                                        "score": 0, "eval_score": 0, "domain": domain, "userid": "admin"}
                         batch_insert.append(insert_json)
-        dbutil.save_training_data_batch(batch_insert)
+        self.dbutil.save_training_data_batch(batch_insert)
         return
 
     '''

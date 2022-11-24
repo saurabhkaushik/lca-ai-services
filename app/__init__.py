@@ -17,14 +17,14 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
 
     domains = apps.config['DOMAINS']
     google_cert_key = apps.config['GOOGLE_CERT_KEY']
+    db_host = apps.config['DB_HOST']
+    db_user = apps.config['DB_USER']
+    db_password = apps.config['DB_PASSWORD']
 
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_cert_key
 
-    # dbutil.create_database()
-    dbutil = MySQLUtility()
-    score_service = Risk_Score_Service()
-    class_service = Transformer_Classifier()
-    preprocess = PreProcessText()
+    dbutil = MySQLUtility(db_host, db_user, db_password)
+    class_service = Transformer_Classifier(dbutil)
 
     if config_overrides:
         apps.config.update(config_overrides)

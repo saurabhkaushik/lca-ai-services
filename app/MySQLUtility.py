@@ -5,10 +5,7 @@ import datetime
 import mysql.connector
 from mysql.connector.constants import ClientFlag
 
-config2 = {
-    'user': 'root',
-    'password': 'nu123456',
-    'host': '34.170.168.203',
+db_config = {
     'client_flags': [ClientFlag.SSL],
     'ssl_ca': './store/sqldb/server-ca.pem',
     'ssl_cert': './store/sqldb/client-cert.pem',
@@ -48,21 +45,15 @@ schema_training_data = "CREATE TABLE IF NOT EXISTS training_data (" + \
     "domain VARCHAR(255), " + \
     "userid VARCHAR(255));"
 
-connection_pool = None
-try:
-    connection_pool = pooling.MySQLConnectionPool(pool_name="lca_ai_pool",
-                                                  pool_size=5,
-                                                  pool_reset_session=True,
-                                                  **config2)
-except mysql.connector.Error as err:
-    print('DB Connection Error: ', err)
-finally:
-    print("DB Pool Created.")
 
+class MySQLUtility(object):
+    connection_pool = None
 
-class MySQLUtility:
-
-    def __init__(self):
+    def __init__(self, db_url, db_user, db_password):
+        if db_user != '':
+            db_config['user'] = db_user
+            db_config['password'] = db_password
+            db_config['host'] = db_url
         pass
 
     table_id1 = 'contract_data'
@@ -70,8 +61,22 @@ class MySQLUtility:
     table_id3 = 'training_data'
 
     def get_connection(self):
-        connection = connection_pool.get_connection()
+        self.connect = self.connection_pool
+        if self.connect == None:             
+            try:
+                self.connect = pooling.MySQLConnectionPool(pool_name="lca_ui_pool",
+                                                            pool_size=5,
+                                                            pool_reset_session=True,
+                                                            **db_config)
+            except mysql.connector.Error as err:
+                print('DB Connection Error: ', err)
+            finally:
+                print("DB Pool Created.")
+            self.connection_pool = self.connect
+
+        connection = self.connect.get_connection()    
         return connection
+        
 
     def create_database(self):
         cnxn = self.get_connection()

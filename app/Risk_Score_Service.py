@@ -6,14 +6,14 @@ from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
 nlp = spacy.load('en_core_web_md')  # en_core_web_lg / en_core_web_md /
 
-dbutil = MySQLUtility()
 sentiment_pipeline = pipeline(
     "sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 
-
 class Risk_Score_Service:
 
-    def __init__(self) -> None:
+    dbutil = None 
+    def __init__(self, dbutil):
+        self.dbutil = dbutil
         pass
 
     def get_sentiment_score(self, sentence):
@@ -26,7 +26,7 @@ class Risk_Score_Service:
         return sent_score
 
     def get_keywords(self, domain):
-        results = dbutil.get_seed_data(domain)
+        results = self.dbutil.get_seed_data(domain)
         keywords = []
         for row in results:
             keyws = row['keywords'].split(',')

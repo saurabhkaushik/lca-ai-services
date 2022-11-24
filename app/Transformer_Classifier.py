@@ -14,16 +14,18 @@ from app.Risk_Score_Service import Risk_Score_Service
 model_checkpoint = "distilbert-base-uncased"
 tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
 
-dbutil = MySQLUtility()
-risk_score = Risk_Score_Service()
 processTxt = PreProcessText()
 
 
 class Transformer_Classifier:
     label_y = dict()
     label_x = dict()
+    risk_score = None
 
-    def __init__(self) -> None:
+    dbutil = None 
+    def __init__(self, dbutil):
+        self.dbutil = dbutil
+        self.risk_score = Risk_Score_Service(dbutil)
         pass
 
     def process_data(self, row):
@@ -43,7 +45,7 @@ class Transformer_Classifier:
 
     def prepare_train_dataset(self, domain):
         processed_data = []
-        train_data = dbutil.get_training_data(domain)
+        train_data = self.dbutil.get_training_data(domain)
 
         label_count = 0
         for row in train_data:
@@ -53,7 +55,7 @@ class Transformer_Classifier:
                 self.label_x.update({label_count: key})
                 label_count += 1
 
-        train_data = dbutil.get_training_data(domain)
+        train_data = self.dbutil.get_training_data(domain)
         for row in train_data:
             processed_data.append(self.process_data(row))
 
@@ -116,8 +118,8 @@ class Transformer_Classifier:
                 results = self.predict(c_sentence, model)
                 label = results[0]["label"]
                 p_score = (results[0]["score"] * 100)
-                s_score = risk_score.get_sentiment_score(c_sentence)
-                c_score = risk_score.get_semantic_score(c_sentence)
+                s_score = self.risk_score.get_sentiment_score(c_sentence)
+                c_score = self.risk_score.get_semantic_score(c_sentence)
                 return_value[e_index] = {"start_index": start_i, "end_index": end_i,
                                          "p_score": p_score, "s_score": s_score, "c_score": c_score, "label": label}
                 e_index += 1
@@ -125,7 +127,7 @@ class Transformer_Classifier:
 
     def process_contract_training_data_eval(self, domain):
         model = self.load_model(domain)
-        results = dbutil.get_training_data(domain)
+        results = self.dbutil.get_training_data(domain)
         batchupdate = []
         for row in results:
             article_text = row["content"]
@@ -138,14 +140,14 @@ class Transformer_Classifier:
                             "eval_label": label, "eval_score": score}
                 batchupdate.append(single_d)
         print(len(batchupdate))
-        dbutil.update_training_data_batch(batchupdate)
+        self.dbutil.update_training_data_batch(batchupdate)
         return
 
     def evalute_model(self, domain):
         ref = []
         pred = []
 
-        results = dbutil.get_training_data(domain)
+        results = self.dbutil.get_training_data(domain)
         for row in results:
             ref.append(row["label"].lower().strip())
             pred.append(row["eval_label"].lower().strip())

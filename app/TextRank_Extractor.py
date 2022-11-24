@@ -7,11 +7,12 @@ from app.PreProcessText import PreProcessText
 nlp = spacy.load("en_core_web_md")
 nlp.add_pipe("textrank")
 pre_process = PreProcessText()
-dbutil = MySQLUtility()
 
 
 class TextRank_Extractor:
-    def __init__(self) -> None:
+    dbutil = None 
+    def __init__(self, dbutil):
+        self.dbutil = dbutil
         pass
 
     def text_rank(self, text):
@@ -28,7 +29,7 @@ class TextRank_Extractor:
         return res
 
     def extract_keyword_seed_data(self, domain):
-        results = dbutil.get_seed_data(domain)
+        results = self.dbutil.get_seed_data(domain)
         batch_update = []
         for row in results:
             content = row['content']
@@ -43,4 +44,4 @@ class TextRank_Extractor:
                         if len(keywords) > 3:
                             query_json = {"id": id, "keywords": keywords}
                             batch_update.append(query_json)
-        dbutil.update_seed_data_batch(batch_update)
+        self.dbutil.update_seed_data_batch(batch_update)

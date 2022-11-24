@@ -11,11 +11,14 @@ from app.Risk_Score_Service import Risk_Score_Service
 
 # load the dataset
 pre_process = PreProcessText()
-risk_score = Risk_Score_Service()
-dbutil = MySQLUtility()
+
 
 class Keyword_Classifier:
-    def __init__(self) -> None:
+    dbutil = None 
+    risk_score = None
+    def __init__(self, dbutil):
+        self.dbutil = dbutil
+        self.risk_score = Risk_Score_Service(dbutil)
         pass
 
     trainDF = pd.DataFrame()
@@ -23,7 +26,7 @@ class Keyword_Classifier:
 
     def prepare_training_data(self, domain):
         labels, texts = [], []
-        results = dbutil.get_seed_data(domain)
+        results = self.dbutil.get_seed_data(domain)
         for row in results:
             keywords = row['keywords']
             if (keywords != None and len(keywords)) > 0:
@@ -79,7 +82,7 @@ class Keyword_Classifier:
         return predicted[0], max(predicted_prob[0])
 
     def process_contract_data(self, domain):
-        results = dbutil.get_contracts(domain, page="true")
+        results = self.dbutil.get_contracts(domain, page="true")
         batch_insert = []
         for row in results:
             article_text = row["content"]
@@ -101,11 +104,11 @@ class Keyword_Classifier:
                         insert_json = {"content": c_sentence, "type": "contract", "label": label, "eval_label": '',
                                        "score": p_score, "eval_score": 0, "domain": domain, "userid": "admin"}
                         batch_insert.append(insert_json)
-        dbutil.save_training_data_batch(batch_insert)
+        self.dbutil.save_training_data_batch(batch_insert)
         return
 
     def process_seed_data(self, domain):
-        results = dbutil.get_training_data(domain, type="seed")
+        results = self.dbutil.get_training_data(domain, type="seed")
         type = "seed"
         batch_insert = []
         for row in results:
@@ -121,9 +124,9 @@ class Keyword_Classifier:
                     predict_label, predict_prb = self.predict_text_data(
                         c_sentence)
                     p_score = predict_prb * 100
-                    c_score = risk_score.calculate_score(c_sentence, p_score)
+                    c_score = self.risk_score.calculate_score(c_sentence, p_score)
                     insert_json = {"id": id, "eval_label": eval_label,
                                    "score": c_score, "eval_score": eval_score}
                     batch_insert.append(insert_json)
-        dbutil.update_training_data_batch(batch_insert)
+        self.dbutil.update_training_data_batch(batch_insert)
         return
