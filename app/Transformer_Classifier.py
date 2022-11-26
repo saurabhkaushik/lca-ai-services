@@ -7,20 +7,18 @@ from sklearn.model_selection import train_test_split
 from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
                           Trainer, TrainingArguments, pipeline)
 
-from app.MySQLUtility import MySQLUtility
 from app.PreProcessText import PreProcessText
 from app.Risk_Score_Service import Risk_Score_Service
 
 model_checkpoint = "distilbert-base-uncased"
-tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
 
 processTxt = PreProcessText()
-
 
 class Transformer_Classifier:
     label_y = dict()
     label_x = dict()
     risk_score = None
+    tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
 
     dbutil = None 
     def __init__(self, dbutil):
@@ -33,7 +31,7 @@ class Transformer_Classifier:
         text = str(text)
         text = ' '.join(text.split())
 
-        encodings = tokenizer(text, padding="max_length",
+        encodings = self.tokenizer(text, padding="max_length",
                               truncation=True, max_length=128)
 
         label = self.label_y[row['label'].lower().strip()]
@@ -92,7 +90,7 @@ class Transformer_Classifier:
             args=training_args,
             train_dataset=train_hg,
             eval_dataset=valid_hg,
-            tokenizer=tokenizer
+            tokenizer=self.tokenizer
         )
         trainer.train()
         metrics = trainer.evaluate()
@@ -102,7 +100,7 @@ class Transformer_Classifier:
 
     def predict(self, sentences, model):
         classifier = pipeline("text-classification",
-                              model=model, tokenizer=tokenizer)
+                              model=model, tokenizer=self.tokenizer)
         results = classifier(sentences)
         return results
 

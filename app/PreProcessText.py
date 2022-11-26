@@ -1,6 +1,7 @@
 from nltk.corpus import stopwords
 import re
 import string
+import pytextrank # TextRank 
 
 import spacy
 from nltk.stem import PorterStemmer, WordNetLemmatizer
@@ -9,16 +10,20 @@ from nltk.tokenize import RegexpTokenizer
 lemmatizer = WordNetLemmatizer()
 stemmer = PorterStemmer()
 
-nlp = spacy.load('en_core_web_md')
 
-# Text Processing Class
 
 class PreProcessText(object):
+    nlp = spacy.load('en_core_web_md')
+    nlp.add_pipe("textrank")
+
     def __init__(self):
         pass
 
     stopwords = nlp.Defaults.stop_words
     tokenizer = RegexpTokenizer(r'\w+')
+
+    def get_nlp(self): 
+        return self.nlp
 
     def __remove_punctuation(self, text):
         """
@@ -107,7 +112,7 @@ class PreProcessText(object):
 
     def get_sentences_old(self, article_text):
         #sentences = re.split(r' *[\.\?!][\'"\)\]]* *', article_text)
-        about_doc = nlp(article_text)
+        about_doc = self.nlp(article_text)
         sentences = list(about_doc.sents)
         print('Sentences : ', sentences)
         return sentences

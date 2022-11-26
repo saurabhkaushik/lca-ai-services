@@ -1,15 +1,14 @@
 from transformers import pipeline
-from app.MySQLUtility import MySQLUtility
-import spacy
 from nltk.stem import WordNetLemmatizer
+from app.PreProcessText import PreProcessText
 
 lemmatizer = WordNetLemmatizer()
-nlp = spacy.load('en_core_web_md')  # en_core_web_lg / en_core_web_md /
 
-sentiment_pipeline = pipeline(
-    "sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+preprocess = PreProcessText()
 
 class Risk_Score_Service:
+    sentiment_pipeline = pipeline(
+        "sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 
     dbutil = None 
     def __init__(self, dbutil):
@@ -18,7 +17,7 @@ class Risk_Score_Service:
 
     def get_sentiment_score(self, sentence):
         data = [sentence]
-        sent_result = sentiment_pipeline(data)
+        sent_result = self.sentiment_pipeline(data)
         #print (sent_result)
         sent_score = (
             sent_result[0]['score']) if sent_result[0]['label'] == 'POSITIVE' else -(sent_result[0]['score'])
@@ -41,7 +40,9 @@ class Risk_Score_Service:
         return keywords
 
     def get_semantic_score(self, sentence):
-        score = 0
+        score = 0        
+        nlp = preprocess.get_nlp()
+        
         doc = nlp(sentence)
         for token in doc:
             if (token.pos_ == "ADJ" or token.pos_ == "VERB") and (not token.is_stop):

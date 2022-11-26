@@ -1,11 +1,6 @@
-import pytextrank
 import pandas as pd
-import spacy
-from app.MySQLUtility import MySQLUtility
 from app.PreProcessText import PreProcessText
 
-nlp = spacy.load("en_core_web_md")
-nlp.add_pipe("textrank")
 pre_process = PreProcessText()
 
 
@@ -16,6 +11,7 @@ class TextRank_Extractor:
         pass
 
     def text_rank(self, text):
+        nlp = pre_process.get_nlp()
         doc = nlp(text)
         keyword = []
         for phrase in doc._.phrases:

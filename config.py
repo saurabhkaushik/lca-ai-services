@@ -15,6 +15,7 @@ class DevelopmentConfig(Config):
     DB_HOST = '34.170.168.203'
     DB_USER = 'root'
     DB_PASSWORD = 'nu123456'
+    APP_ENV = 'LOCAL' # 'LOCAL', 'CLOUD'
 
 class TestingConfig(Config):
     DATABASE_URI = 'sqlite:///:memory:'

@@ -1,15 +1,14 @@
-from app.MySQLUtility import MySQLUtility
-from app.TextRank_Extractor import TextRank_Extractor
-import json
 import csv
 import os
 from app.PreProcessText import PreProcessText
+from app.TextRank_Extractor import TextRank_Extractor
 
-processTxt = PreProcessText()
 data_folder = './data/'
 
 class Data_Loader(object):
     dbutil = None 
+    processTxt = PreProcessText()
+
     def __init__(self, dbutil):
         self.dbutil = dbutil
         pass
@@ -31,10 +30,10 @@ class Data_Loader(object):
         self.dbutil.save_contracts_batch(batch_insert)
         return None
 
-    def import_seed_data_batch(self, domain):
+    def import_seed_data_batch(self):
         text_rank = TextRank_Extractor(self.dbutil)
         batch_insert = []
-        seed_folder = data_folder + domain + '/'
+        seed_folder = data_folder 
         filelist = os.listdir(seed_folder)
         for file_name in filelist:
             if file_name.endswith(".csv"):
@@ -68,11 +67,11 @@ class Data_Loader(object):
             label = row['label']
             domain = row['domain']
             if content != None and len(content) > 0:
-                sentences = processTxt.get_sentences(content)
+                sentences = self.processTxt.get_sentences(content)
                 #sentences = re.split(r' *[\.\?!][\'"\)\]]* *', content)
                 for sentence in sentences:
                     sentence = str(sentence['sentance'])
-                    sentence = processTxt.clean_text(sentence)
+                    sentence = self.processTxt.clean_text(sentence)
                     if len(sentence) > 4:
                         #print (">> Statements : ", sentence, " Label: ", label)
                         insert_json = {"content": sentence, "type": "seed", "label": label, "eval_label": '',

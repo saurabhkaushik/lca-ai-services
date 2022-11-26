@@ -6,8 +6,7 @@ from werkzeug.exceptions import abort
 from flask import make_response, jsonify
 from app.Transformer_Classifier import Transformer_Classifier
 from app.MySQLUtility import MySQLUtility
-from app.Risk_Score_Service import Risk_Score_Service
-from app.PreProcessText import PreProcessText
+from app.GCP_Storage import GCP_Storage
 
 def create_app(config, debug=False, testing=False, config_overrides=None):
     apps = Flask(__name__)
@@ -20,11 +19,9 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     db_host = apps.config['DB_HOST']
     db_user = apps.config['DB_USER']
     db_password = apps.config['DB_PASSWORD']
+    app_env = apps.config['APP_ENV']
 
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_cert_key
-
-    dbutil = MySQLUtility(db_host, db_user, db_password)
-    class_service = Transformer_Classifier(dbutil)
 
     if config_overrides:
         apps.config.update(config_overrides)
@@ -34,6 +31,13 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         logging.basicConfig(level=logging.INFO)
 
     logging.getLogger().setLevel(logging.INFO)
+
+    dbutil = MySQLUtility(db_host, db_user, db_password)
+    class_service = Transformer_Classifier(dbutil)
+
+    if app_env == 'CLOUD': 
+        gcp_store = GCP_Storage(domains)
+        gcp_store.download_models()
 
     @apps.route('/')  
     def index():
@@ -71,7 +75,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     @apps.route('/test_service', methods=('GET', 'POST'))
     def test_service():
         contract = "This is a very legalised way of doing businesss."
-        domain = "Liabilities"
+        domain = "liabilities"
         model = class_service.load_model(domain)
         answer_results = class_service.process_contract_request(
             contract, model)
