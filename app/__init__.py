@@ -7,22 +7,30 @@ from flask import make_response, jsonify
 from app.Transformer_Classifier import Transformer_Classifier
 from app.MySQLUtility import MySQLUtility
 from app.GCP_Storage import GCP_Storage
+from app.Data_ETL_Pipeline import Data_ETL_Pipeline
 
 def create_app(config, debug=False, testing=False, config_overrides=None):
     apps = Flask(__name__)
+
+    app_env = os.getenv('LCA_APP_ENV')
+    if app_env == 'production':
+        apps.config.from_object(config.ProductionConfig)
+        print('Envornment: ', app_env)
+    else: 
+        apps.config.from_object(config.DevelopmentConfig)
+        print('Envornment: ', app_env)
+
     apps.config.from_object(config.DevelopmentConfig)
     apps.debug = debug
     apps.testing = testing
 
     domains = apps.config['DOMAINS']
-    google_cert_key = apps.config['GOOGLE_CERT_KEY']
     db_host = apps.config['DB_HOST']
     db_user = apps.config['DB_USER']
     db_password = apps.config['DB_PASSWORD']
-    app_env = apps.config['APP_ENV']
-
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = google_cert_key
-
+    db_name = apps.config['DB_NAME']
+    data_env = apps.config['DATA_ENV']
+    
     if config_overrides:
         apps.config.update(config_overrides)
 
@@ -32,10 +40,11 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
 
     logging.getLogger().setLevel(logging.INFO)
 
-    dbutil = MySQLUtility(db_host, db_user, db_password)
+    dbutil = MySQLUtility(db_host, db_user, db_password, db_name)
     class_service = Transformer_Classifier(dbutil)
 
-    if app_env == 'CLOUD': 
+    if data_env == 'cloud': 
+        print ('Updating Model from initialization.')
         gcp_store = GCP_Storage(domains)
         gcp_store.download_models()
 
@@ -71,15 +80,34 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         for domain in domains:
             class_service.training(domain)
         return render_template('index.html')
+    
+    @apps.route('/etl_service', methods=('GET', 'POST'))
+    def etl_service():
+        data_etl = Data_ETL_Pipeline(dbutil, domains)
+        data_etl.start_process()
+        return render_template('index.html')
+    
+    @apps.route('/get_seed_service', methods=('GET', 'POST'))
+    def get_seed_service():
+        store_util = GCP_Storage(domains)
+        store_util.download_seed_data()
+        return render_template('index.html')
+    
+    @apps.route('/get_model_service', methods=('GET', 'POST'))
+    def get_model_service():
+        store_util = GCP_Storage(domains)
+        store_util.download_models()
+        return render_template('index.html')
 
-    @apps.route('/test_service', methods=('GET', 'POST'))
-    def test_service():
+    @apps.route('/model_test_service', methods=('GET', 'POST'))
+    def model_test_service():
         contract = "This is a very legalised way of doing businesss."
-        domain = "liabilities"
-        model = class_service.load_model(domain)
-        answer_results = class_service.process_contract_request(
-            contract, model)
-        print("Contract Analysis : ", answer_results)
+        answer_results = {}
+        for domain in domains:
+            model = class_service.load_model(domain)
+            answer_results = class_service.process_contract_request(
+                contract, model)
+            print("Contract Analysis : ", answer_results)
         return jsonify(answer_results)
 
     @apps.errorhandler(404)

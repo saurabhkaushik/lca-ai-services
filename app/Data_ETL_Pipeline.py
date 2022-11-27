@@ -72,3 +72,12 @@ class Data_ETL_Pipeline(object):
             
             print ("class_service.Transformer Classifier Accuracy: " + domain)
             self.class_service.evalute_model(domain)
+
+    def start_process(self):
+        #dbloader = Data_ETL_Pipeline()
+        self.create_dataset()
+        self.load_seed_training_data() 
+        self.load_contract_data()
+        self.process_keyword_model()
+        self.process_transformer_model()
+        self.evaluate_results()

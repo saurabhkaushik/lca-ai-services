@@ -1,3 +1,6 @@
+gcloud config set account 'legaltest200@gmail.com'
+gcloud config set project 'genuine-wording-362504'
+
 docker build -t law-service-app . 
 
 gcloud auth configure-docker asia-south1-docker.pkg.dev

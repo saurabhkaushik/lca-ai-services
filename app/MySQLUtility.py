@@ -10,7 +10,6 @@ db_config = {
     'ssl_ca': './store/sqldb/server-ca.pem',
     'ssl_cert': './store/sqldb/client-cert.pem',
     'ssl_key': './store/sqldb/client-key.pem',
-    'database': 'lca_db'
 }
 
 schema_contract_data = "CREATE TABLE IF NOT EXISTS contract_data (" + \
@@ -49,11 +48,12 @@ schema_training_data = "CREATE TABLE IF NOT EXISTS training_data (" + \
 class MySQLUtility(object):
     connection_pool = None
 
-    def __init__(self, db_url, db_user, db_password):
+    def __init__(self, db_host, db_user, db_password, db_name):
         if db_user != '':
             db_config['user'] = db_user
             db_config['password'] = db_password
-            db_config['host'] = db_url
+            db_config['host'] = db_host
+            db_config['database'] = db_name
         pass
 
     table_id1 = 'contract_data'

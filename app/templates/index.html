@@ -8,10 +8,25 @@
     <li>Liability Analysis Service </li>
     <li>Domain Improvement Service </li>
     <br><br>
-    <a href="{{ url_for('training_service') }}">
-        <h4> Training Service </h4>
-    </a>
-    <a href="{{ url_for('test_service') }}">
-        <h4> Classify Service </h4>
-    </a>
+    <h3>Here are Admin Service for LCA Tool. </h3>
+    <li>
+        <a href="{{ url_for('model_test_service') }}">
+            Model Testing Service 
+        </a></li>
+    <li>
+        <a href="{{ url_for('training_service') }}">
+            Training Service 
+        </a></li>    
+    <li>
+        <a href="{{ url_for('etl_service') }}">
+            ETL Service 
+        </a></li>
+    <li>
+        <a href="{{ url_for('get_seed_service') }}">
+            Get Seeds Service 
+        </a></li>
+    <li>
+        <a href="{{ url_for('get_model_service') }}">
+            Get Models Service 
+        </a></li>
 {% endblock %}

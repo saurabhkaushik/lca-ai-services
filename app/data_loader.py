@@ -15,7 +15,7 @@ class Data_Loader(object):
 
     def import_reports_contract_data(self, domain):
         batch_insert = []
-        reports_folder = data_folder + domain + '/reports/'
+        reports_folder = data_folder + 'reports/' + domain + '/'
         filelist = os.listdir(reports_folder)
         for file_name in filelist:
             if file_name.endswith(".txt"):
