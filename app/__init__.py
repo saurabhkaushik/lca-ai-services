@@ -5,8 +5,8 @@ from flask import Flask, render_template, request, url_for, flash, redirect
 from werkzeug.exceptions import abort
 from flask import make_response, jsonify
 from app.Transformer_Classifier import Transformer_Classifier
-from app.MySQLUtility import MySQLUtility
-from app.GCP_Storage import GCP_Storage
+from app.common.MySQLUtility import MySQLUtility
+from app.common.GCP_Storage import GCP_Storage
 from app.Data_ETL_Pipeline import Data_ETL_Pipeline
 
 def create_app(config, debug=False, testing=False, config_overrides=None):

@@ -41,3 +41,18 @@ class TextRank_Extractor:
                             query_json = {"id": id, "keywords": keywords}
                             batch_update.append(query_json)
         self.dbutil.update_seed_data_batch(batch_update)
+
+    def get_keywords(self, domain):
+        results = self.dbutil.get_seed_data(domain)
+        keywords = []
+        for row in results:
+            keyws = row['keywords'].split(',')
+            for kwyw in keyws:
+                kw = kwyw.split()
+                str_k = ''
+                for k in kw:
+                    str_k += pre_process.get_lemmantizer(k) + ' '
+                keywords.append(str_k.strip())
+        keywords = sorted(
+            set(keywords), key=lambda x: keywords.count(x), reverse=True)
+        return keywords

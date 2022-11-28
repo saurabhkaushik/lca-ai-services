@@ -1,14 +1,13 @@
 from transformers import pipeline
-from nltk.stem import WordNetLemmatizer
 from app.PreProcessText import PreProcessText
-
-lemmatizer = WordNetLemmatizer()
 
 preprocess = PreProcessText()
 
+sentiment_model = "distilbert-base-uncased-finetuned-sst-2-english"
+
 class Risk_Score_Service:
     sentiment_pipeline = pipeline(
-        "sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+        "sentiment-analysis", model=sentiment_model)
 
     dbutil = None 
     def __init__(self, dbutil):
@@ -23,21 +22,6 @@ class Risk_Score_Service:
             sent_result[0]['score']) if sent_result[0]['label'] == 'POSITIVE' else -(sent_result[0]['score'])
         sent_score = sent_score * 100
         return sent_score
-
-    def get_keywords(self, domain):
-        results = self.dbutil.get_seed_data(domain)
-        keywords = []
-        for row in results:
-            keyws = row['keywords'].split(',')
-            for kwyw in keyws:
-                kw = kwyw.split()
-                str_k = ''
-                for k in kw:
-                    str_k += lemmatizer.lemmatize(k) + ' '
-                keywords.append(str_k.strip())
-        keywords = sorted(
-            set(keywords), key=lambda x: keywords.count(x), reverse=True)
-        return keywords
 
     def get_semantic_score(self, sentence):
         score = 0        

@@ -5,7 +5,7 @@ from joblib import dump, load
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-from app.MySQLUtility import MySQLUtility
+from app.common.MySQLUtility import MySQLUtility
 from app.PreProcessText import PreProcessText
 from app.Risk_Score_Service import Risk_Score_Service
 
@@ -130,3 +130,5 @@ class Keyword_Classifier:
                     batch_insert.append(insert_json)
         self.dbutil.update_training_data_batch(batch_insert)
         return
+
+

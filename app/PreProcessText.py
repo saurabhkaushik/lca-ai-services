@@ -10,8 +10,6 @@ from nltk.tokenize import RegexpTokenizer
 lemmatizer = WordNetLemmatizer()
 stemmer = PorterStemmer()
 
-
-
 class PreProcessText(object):
     nlp = spacy.load('en_core_web_md')
     nlp.add_pipe("textrank")
@@ -73,6 +71,10 @@ class PreProcessText(object):
         #stem_words=[stemmer.stem(w) for w in filtered_words]
         lemma_words = [lemmatizer.lemmatize(w) for w in filtered_words]
         return " ".join(lemma_words)
+
+    def get_lemmantizer(self, text): 
+        lem_txt = lemmatizer.lemmatize(text)
+        return lem_txt
 
     def clean_text(self, article_text):
         rem_num = re.sub('[0-9]+', '', article_text)

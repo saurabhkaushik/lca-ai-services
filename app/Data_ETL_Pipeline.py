@@ -2,7 +2,7 @@ from app.Transformer_Classifier import Transformer_Classifier
 from app.Data_Loader import Data_Loader
 from app.TextRank_Extractor import TextRank_Extractor
 from app.Keyword_Classifier import Keyword_Classifier
-from app.MySQLUtility import MySQLUtility
+from app.common.MySQLUtility import MySQLUtility
 
 class Data_ETL_Pipeline(object):
     dbutil = None
