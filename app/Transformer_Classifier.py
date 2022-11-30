@@ -119,7 +119,7 @@ class Transformer_Classifier:
             c_sentence = sents['sentance']
             start_i = sents['start']
             end_i = sents['end']
-            if len(c_sentence) > 0 and len(c_sentence) < 512:
+            if len(c_sentence) > 10 and len(c_sentence) < 512:
                 results = self.predict(c_sentence, model)
                 label = results[0]["label"]
                 p_score = (results[0]["score"] * 100)

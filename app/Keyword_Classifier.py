@@ -105,7 +105,7 @@ class Keyword_Classifier:
             for c_sentence in sentences:
                 c_sentence = str(c_sentence['sentance'])
                 c_sentence = pre_process.clean_text(c_sentence)
-                if len(c_sentence) > 4:
+                if len(c_sentence) > 10:
                     predict_label, predict_prb = self.predict_text_data(
                         c_sentence, domain)
                     p_score = predict_prb * 100
@@ -134,7 +134,7 @@ class Keyword_Classifier:
             sentences = pre_process.get_sentences(article_text)
             for c_sentence in sentences:
                 c_sentence = str(c_sentence['sentance'])
-                if c_sentence != None and len(c_sentence) > 4:
+                if c_sentence != None and len(c_sentence) > 10:
                     predict_label, predict_prb = self.predict_text_data(
                         c_sentence)
                     p_score = predict_prb * 100

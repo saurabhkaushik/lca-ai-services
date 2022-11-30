@@ -34,7 +34,7 @@ class TextRank_Extractor:
                 sentences = pre_process.get_sentences(content)
                 for stmt in sentences:
                     stmt = str(stmt['sentance'])
-                    if len(stmt) > 0:
+                    if len(stmt) > 10:
                         keywords = self.text_rank(stmt)
                         keywords = ", ".join(keywords)
                         if len(keywords) > 3:

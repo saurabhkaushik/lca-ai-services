@@ -77,7 +77,7 @@ class Data_Loader(object):
                 for sentence in sentences:
                     sentence = str(sentence['sentance'])
                     sentence = self.processTxt.clean_text(sentence)
-                    if len(sentence) > 4:
+                    if len(sentence) > 10:
                         #print (">> Statements : ", sentence, " Label: ", label)
                         insert_json = {"content": sentence, "type": "seed", "label": label, "eval_label": '',
                                        "score": 0, "eval_score": 0, "domain": domain, "userid": "admin"}
