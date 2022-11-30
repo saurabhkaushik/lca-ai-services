@@ -13,8 +13,9 @@ docker push asia-south1-docker.pkg.dev/genuine-wording-362504/lca-service-app/lc
 
 # EKS Setup
 gcloud container clusters get-credentials "autopilot-cluster-2" --region asia-south1
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
+kubectl rollout restart deployment lca-service-app-gke
+#kubectl apply -f deployment.yaml 
+#kubectl apply -f service.yaml
 
 # Validation 
 kubectl get deployments

@@ -3,6 +3,22 @@ import string
 import pytextrank # TextRank 
 
 import spacy
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+from nltk.tokenize import RegexpTokenizer
+
+import nltk
+import ssl
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+
+nltk.download("wordnet")
+
+lemmatizer = WordNetLemmatizer()
+stemmer = PorterStemmer()
 
 class PreProcessText(object):
     nlp = spacy.load('en_core_web_md')
@@ -12,6 +28,7 @@ class PreProcessText(object):
         pass
 
     stopwords = nlp.Defaults.stop_words
+    tokenizer = RegexpTokenizer(r'\w+')
 
     def get_nlp(self): 
         return self.nlp
@@ -48,34 +65,26 @@ class PreProcessText(object):
     def preprocess_text(self, sentence):
         sentence = str(sentence)
         sentence = sentence.lower()
-
         # HTML CLEAN
         sentence = sentence.replace('{html}', "")
         cleanr = re.compile('<.*?>')
         cleantext = re.sub(cleanr, '', sentence)
         rem_url = re.sub(r'http\S+', '', cleantext)
-
         # Number Clean
         rem_num = re.sub('[0-9]+', '', rem_url)
+        #print("Cleaner Txt:", cleantext)
+        # text = re.sub(r"[-()\"#/@;:<>{}=~|.?,]", "", text)
 
-        #print (rem_num)
-        doc = self.nlp(rem_num)
-        stop_words = [token.text for token in doc if not token.is_stop]
-        stop_text = " ".join(stop_words).strip()
-
-        #print (stop_text)
-        doc = self.nlp(stop_text)
-        lemma_words = [token.lemma_ for token in doc]
-        lem_text = " ".join(lemma_words).strip()
-
-        #print (lem_text)
-        return lem_text
+        tokens = self.tokenizer.tokenize(rem_num)
+        filtered_words = [w for w in tokens if len(
+            w) > 2 if not w in self.stopwords]
+        #stem_words=[stemmer.stem(w) for w in filtered_words]
+        lemma_words = [lemmatizer.lemmatize(w) for w in filtered_words]
+        return " ".join(lemma_words)
 
     def get_lemmantizer(self, text): 
-        doc = self.nlp(text)
-        lemma_words = [token.lemma_ for token in doc]
-        lem_text = " ".join(lemma_words).strip()
-        return lem_text
+        lem_txt = lemmatizer.lemmatize(text)
+        return lem_txt
 
     def clean_text(self, article_text):
         rem_num = re.sub('[0-9]+', '', article_text)

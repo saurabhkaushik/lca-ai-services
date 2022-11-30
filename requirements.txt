@@ -9,6 +9,5 @@ PyTextRank
 datasets
 scikit-learn
 mysql-connector-python
-nltk
 waitress
 google-cloud-storage
