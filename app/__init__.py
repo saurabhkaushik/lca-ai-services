@@ -98,6 +98,12 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         store_util = GCP_Storage(domains)
         store_util.download_models()
         return render_template('index.html')
+    
+    @apps.route('/put_model_service', methods=('GET', 'POST'))
+    def put_model_service():
+        store_util = GCP_Storage(domains)
+        store_util.upload_models()
+        return render_template('index.html')
 
     @apps.route('/model_test_service', methods=('GET', 'POST'))
     def model_test_service():

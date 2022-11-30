@@ -1,3 +1,6 @@
+import logging
+import traceback
+
 import pandas as pd
 import pyarrow as pa
 from datasets import Dataset
@@ -74,7 +77,11 @@ class Transformer_Classifier:
         return model
 
     def training(self, domain):
-        train_hg, valid_hg = self.prepare_train_dataset(domain)
+        try: 
+            train_hg, valid_hg = self.prepare_train_dataset(domain)
+        except Exception as e: 
+            logging.error(traceback.format_exc())
+            return
 
         training_args = TrainingArguments(
             output_dir="./result", evaluation_strategy="epoch")
@@ -118,8 +125,9 @@ class Transformer_Classifier:
                 p_score = (results[0]["score"] * 100)
                 s_score = self.risk_score.get_sentiment_score(c_sentence)
                 c_score = self.risk_score.get_semantic_score(c_sentence)
+                sc_score = int(50 + ((s_score + c_score) / 4))
                 return_value[e_index] = {"start_index": start_i, "end_index": end_i,
-                                         "p_score": p_score, "s_score": s_score, "c_score": c_score, "label": label}
+                                         "p_score": p_score, "c_score": sc_score, "label": label}
                 e_index += 1
         return return_value
 

@@ -1,3 +1,6 @@
+import logging
+import traceback
+
 import pandas as pd
 from sklearn import naive_bayes
 from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
@@ -40,11 +43,16 @@ class Keyword_Classifier:
         print (self.trainDF['label'])
 
     def train_model(self, domain):
+        #print (self.trainDF['text'], self.trainDF['label'])
         self.text_clf = Pipeline([('vect', CountVectorizer(stop_words='english')),
                                   ('tfidf', TfidfTransformer()),
                                   ('clf', naive_bayes.MultinomialNB())])
-        self.text_clf = self.text_clf.fit(
-            self.trainDF['text'], self.trainDF['label'])
+        try: 
+            self.text_clf = self.text_clf.fit(
+                self.trainDF['text'], self.trainDF['label'])
+        except Exception as e: 
+            logging.error(traceback.format_exc())
+            return
 
         dump(self.text_clf, './model/' + domain + '/keyword_class.joblib')
         #print (self.trainDF['label'])
@@ -53,8 +61,12 @@ class Keyword_Classifier:
     def evaluate_model(self, domain):
         self.prepare_training_data(domain)
         self.text_clf = load('./model/' + domain + '/keyword_class.joblib')
-
-        predicted = self.text_clf.predict(self.trainDF['text'])
+        predicted = None
+        try:
+            predicted = self.text_clf.predict(self.trainDF['text'])
+        except Exception as e: 
+            logging.error(traceback.format_exc())
+            return
 
         y_labels = self.trainDF['label'].to_numpy()
         #print ('Labels', y_labels)
@@ -66,8 +78,10 @@ class Keyword_Classifier:
             print("Confusion Matrix: \n", matrix)
             acc_score = accuracy_score(y_labels, predicted)
             print("Accuracy Score: \n", acc_score*100, "%")
-        except:
-            print()
+        except Exception as e: 
+            logging.error(traceback.format_exc())
+            return
+        return
 
     def predict_text_data(self, text, domain):
         self.text_clf = load('./model/' + domain + '/keyword_class.joblib')

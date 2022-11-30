@@ -1,4 +1,3 @@
-from nltk.corpus import stopwords
 import re
 import string
 import pytextrank # TextRank 
@@ -67,7 +66,7 @@ class PreProcessText(object):
 
         tokens = self.tokenizer.tokenize(rem_num)
         filtered_words = [w for w in tokens if len(
-            w) > 2 if not w in stopwords.words('english')]
+            w) > 2 if not w in self.stopwords]
         #stem_words=[stemmer.stem(w) for w in filtered_words]
         lemma_words = [lemmatizer.lemmatize(w) for w in filtered_words]
         return " ".join(lemma_words)

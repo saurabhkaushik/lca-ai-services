@@ -11,22 +11,26 @@
     <h3>Here are Admin Service for LCA Tool. </h3>
     <li>
         <a href="{{ url_for('model_test_service') }}">
-            Model Testing Service 
+            Model Testing - Service 
         </a></li>
     <li>
         <a href="{{ url_for('training_service') }}">
-            Training Service 
+            Model Training - Service 
         </a></li>    
     <li>
         <a href="{{ url_for('etl_service') }}">
-            ETL Service 
+            Run ETL - Service 
         </a></li>
     <li>
         <a href="{{ url_for('get_seed_service') }}">
-            Get Seeds Service 
+            Get Seed Files - Service 
         </a></li>
     <li>
         <a href="{{ url_for('get_model_service') }}">
-            Get Models Service 
+            Get Model Files - Service 
+        </a></li>
+    <li>
+        <a href="{{ url_for('put_model_service') }}">
+            Put Model Files - Service 
         </a></li>
 {% endblock %}

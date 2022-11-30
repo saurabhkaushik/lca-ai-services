@@ -6,6 +6,7 @@ export PORT=8081
 source env/bin/activate
 #python3 -m pip install --upgrade pip
 #pip3 install -r requirements.txt --upgrade
-#python3 -m spacy download en
+#python3 -m spacy download en_core_web_md
+#python3 -m nltk.downloader stopwords
 python3 app-run.py 
 # deactivate

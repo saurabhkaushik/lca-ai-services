@@ -13,6 +13,7 @@ ENV PORT 8080
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 RUN python3 -m spacy download en_core_web_md
+#RUN python3 -m nltk.downloader stopwords
 
 EXPOSE 8080
 CMD ["python3", "app-run.py"]

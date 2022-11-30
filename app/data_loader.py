@@ -1,3 +1,6 @@
+import logging
+import traceback
+
 import csv
 import os
 from app.PreProcessText import PreProcessText
@@ -42,18 +45,20 @@ class Data_Loader(object):
                     seedreader = csv.reader(csvfile)
                     line_count = 0
                     for row in seedreader:
-                        if line_count > 0:
-                            keywords = text_rank.text_rank(row[0].rstrip())
-                            keywords = ", ".join(keywords).rstrip().lower().strip()
-                            label = row[1].rstrip().lower().strip()
-                            domain = row[2].rstrip().lower().strip()
-                            content = row[0].rstrip()
-                            if len(content) > 3:
-                                insert_json = {"keywords": keywords, "content": content, "label": label,
-                                            "type": 'curated', "domain": domain, "userid": 'admin'}
-                                batch_insert.append(insert_json)
-
-                        line_count += 1
+                        try: 
+                            if line_count > 0:                            
+                                keywords = text_rank.text_rank(row[0].rstrip())
+                                keywords = ", ".join(keywords).rstrip().lower().strip()
+                                label = row[1].rstrip().lower().strip()
+                                domain = row[2].rstrip().lower().strip()
+                                content = row[0].rstrip()
+                                if len(content) > 3:
+                                    insert_json = {"keywords": keywords, "content": content, "label": label,
+                                                "type": 'curated', "domain": domain, "userid": 'admin'}
+                                    batch_insert.append(insert_json)
+                            line_count += 1
+                        except Exception as e: 
+                                logging.error(traceback.format_exc())
                 self.dbutil.save_seed_data_batch(batch_insert)
                 csvfile.close()
         return None 
