@@ -14,7 +14,8 @@ from app.Risk_Score_Service import Risk_Score_Service
 
 # load the dataset
 pre_process = PreProcessText()
-
+min_sentence_len = 10
+keyword_threshold = 80
 
 class Keyword_Classifier:
     dbutil = None 
@@ -100,19 +101,18 @@ class Keyword_Classifier:
         batch_insert = []
         for row in results:
             article_text = row["content"]
-            print("Filename:", row["title"])
-            sentences = pre_process.get_sentences(article_text)
+            print("Filename:", row["title"])            
+            sentences = pre_process.get_sentences(article_text)            
             for c_sentence in sentences:
                 c_sentence = str(c_sentence['sentance'])
-                c_sentence = pre_process.clean_text(c_sentence)
-                if len(c_sentence) > 10:
+                if len(c_sentence) > min_sentence_len:
                     predict_label, predict_prb = self.predict_text_data(
                         c_sentence, domain)
                     p_score = predict_prb * 100
                     #s_score = risk_score.get_sentiment_score(c_sentence)
                     label = predict_label.lower().strip()
 
-                    if p_score > 75:
+                    if p_score > keyword_threshold:
                         print("Sentences : ", c_sentence, ", Result : ",
                               label.lower().strip(), ", P_Score : ", p_score)
                         insert_json = {"content": c_sentence, "type": "contract", "label": label, "eval_label": '',

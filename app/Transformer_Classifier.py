@@ -14,7 +14,7 @@ from app.PreProcessText import PreProcessText
 from app.Risk_Score_Service import Risk_Score_Service
 
 model_checkpoint = "distilbert-base-uncased"
-
+min_sentence_len = 10
 processTxt = PreProcessText()
 
 class Transformer_Classifier:
@@ -119,15 +119,16 @@ class Transformer_Classifier:
             c_sentence = sents['sentance']
             start_i = sents['start']
             end_i = sents['end']
-            if len(c_sentence) > 10 and len(c_sentence) < 512:
+            if len(c_sentence) > min_sentence_len and len(c_sentence) < 512:
                 results = self.predict(c_sentence, model)
                 label = results[0]["label"]
                 p_score = (results[0]["score"] * 100)
+                #k_score = 
                 s_score = self.risk_score.get_sentiment_score(c_sentence)
                 c_score = self.risk_score.get_semantic_score(c_sentence)
                 sc_score = int(50 + ((s_score + c_score) / 4))
-                return_value[e_index] = {"start_index": start_i, "end_index": end_i,
-                                         "p_score": p_score, "c_score": sc_score, "label": label}
+                return_value[e_index] = {"start_index": start_i, "end_index": end_i, "sentence" : c_sentence, 
+                                         "p_score": p_score, "c_score": c_score, "s_score": s_score, "sc_score": sc_score, "label": label}
                 e_index += 1
         return return_value
 

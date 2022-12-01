@@ -95,33 +95,32 @@ class PreProcessText(object):
         return text
 
     def get_sentences(self, article_text):
-        sentences = re.split(r' *[\.\?!][\'"\)\]]* *', article_text)
+        sentences = self.get_sentences_spacy(article_text)
         sent_list = []
         start = 0
         end = 0
-        for sent in sentences:                  
+        for sent in sentences:     
+            sent = str(sent)             
             end = start + len(sent) + 1    
             trailing_space = len(article_text[start:end]) - len(article_text[start:end].lstrip()) 
             start += trailing_space
             end += trailing_space       
-            #print('Sent:', repr(sent), (len(sent)+1))
-            #print('Article:', repr(article_text[start:end]), len(article_text[start:end]), start, end)
-            stmts = self.get_sentences_spacy(article_text[start:end])
-            stmt = ''
-            if len(stmts) > 0:
-                stmt = stmts[0]
+         
+            stmt = self.clean_text(sent)            
+
             json_sent = {
                 'sentance': str(stmt), 'start': start, 'end': end}
             sent_list.append(json_sent)
             start = end 
-            #print('Sentences : ', json_sent)
-        #print(sent_list)
         return sent_list
+    
+    def get_sentences_regex(self, article_text):
+        sentences = re.split(r' *[\.\?!][\'"\)\]]* *', article_text)
+        return sentences
 
     def get_sentences_spacy(self, article_text):
-        #sentences = re.split(r' *[\.\?!][\'"\)\]]* *', article_text)
         about_doc = self.nlp(article_text)
-        sentences = list(about_doc.sents)       
+        sentences = list(about_doc.sents)  
         return sentences
 
     def token_words(self, text=''):

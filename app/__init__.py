@@ -70,7 +70,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         print('Contract : \n', contract)
         model = class_service.load_model(domain)
         response = class_service.process_contract_request(contract, model)
-        #dbutil.update_contracts_id(contract_id, contract_data['title'], contract, str(response))
+        dbutil.update_contracts_id(contract_id, contract_data['title'], contract, str(response))
         json_response = jsonify(response)
         print("Response : \n", response)
         return json_response

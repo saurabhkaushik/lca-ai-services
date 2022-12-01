@@ -7,6 +7,7 @@ from app.PreProcessText import PreProcessText
 from app.TextRank_Extractor import TextRank_Extractor
 
 data_folder = './data/'
+min_sentence_len = 10
 
 class Data_Loader(object):
     dbutil = None 
@@ -19,13 +20,18 @@ class Data_Loader(object):
     def import_reports_contract_data(self, domain):
         batch_insert = []
         reports_folder = data_folder + 'reports/' + domain + '/'
-        filelist = os.listdir(reports_folder)
+        filelist = []
+        try:
+            filelist = os.listdir(reports_folder)
+        except Exception as e: 
+            logging.error(traceback.format_exc())
+            return None
         for file_name in filelist:
             if file_name.endswith(".txt"):
                 print("Working with ", file_name)
                 with open(reports_folder + file_name, encoding="ISO-8859-1") as report_file:
                     filestr = report_file.read()
-                    if len(filestr) > 10:
+                    if len(filestr) > min_sentence_len:
                         insert_json = {"title": file_name, "content": filestr,  "type": "curated",
                                     "response": "", "domain": domain, "userid": "admin"}
                         batch_insert.append(insert_json)
@@ -52,7 +58,7 @@ class Data_Loader(object):
                                 label = row[1].rstrip().lower().strip()
                                 domain = row[2].rstrip().lower().strip()
                                 content = row[0].rstrip()
-                                if len(content) > 3:
+                                if len(content) > min_sentence_len:
                                     insert_json = {"keywords": keywords, "content": content, "label": label,
                                                 "type": 'curated', "domain": domain, "userid": 'admin'}
                                     batch_insert.append(insert_json)
@@ -71,14 +77,11 @@ class Data_Loader(object):
             content = row['content']
             label = row['label']
             domain = row['domain']
-            if content != None and len(content) > 0:
+            if content != None and len(content) > min_sentence_len:
                 sentences = self.processTxt.get_sentences(content)
-                #sentences = re.split(r' *[\.\?!][\'"\)\]]* *', content)
                 for sentence in sentences:
                     sentence = str(sentence['sentance'])
-                    sentence = self.processTxt.clean_text(sentence)
-                    if len(sentence) > 10:
-                        #print (">> Statements : ", sentence, " Label: ", label)
+                    if len(sentence) > min_sentence_len:
                         insert_json = {"content": sentence, "type": "seed", "label": label, "eval_label": '',
                                        "score": 0, "eval_score": 0, "domain": domain, "userid": "admin"}
                         batch_insert.append(insert_json)
