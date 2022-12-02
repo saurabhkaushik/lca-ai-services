@@ -26,7 +26,7 @@ class Transformer_Classifier:
     dbutil = None 
     def __init__(self, dbutil):
         self.dbutil = dbutil
-        self.risk_score = Risk_Score_Service(dbutil)
+        self.risk_score = Risk_Score_Service(dbutil)        
         pass
 
     def process_data(self, row):
@@ -111,9 +111,10 @@ class Transformer_Classifier:
         results = classifier(sentences)
         return results
 
-    def process_contract_request(self, article_text, model):
+    def process_contract_request(self, article_text, model, domain):
         return_value = {}
         sentences = processTxt.get_sentences(article_text)
+        self.risk_score.load_polarity_data()
         e_index = 0
         for sents in sentences:
             c_sentence = sents['sentance']
@@ -122,13 +123,12 @@ class Transformer_Classifier:
             if len(c_sentence) > min_sentence_len and len(c_sentence) < 512:
                 results = self.predict(c_sentence, model)
                 label = results[0]["label"]
-                p_score = (results[0]["score"] * 100)
-                #k_score = 
-                s_score = self.risk_score.get_sentiment_score(c_sentence)
-                c_score = self.risk_score.get_semantic_score(c_sentence)
-                sc_score = int(50 + ((s_score + c_score) / 4))
+                p_score = int (results[0]["score"] * 100)
+                c_score = (self.risk_score.get_context_score(c_sentence, domain))
+                sc_score = int (50 + (c_score / 2))
+                risk_score = int ((p_score + sc_score) / 2)
                 return_value[e_index] = {"start_index": start_i, "end_index": end_i, "sentence" : c_sentence, 
-                                         "p_score": p_score, "c_score": c_score, "s_score": s_score, "sc_score": sc_score, "label": label}
+                                         "presence_score": p_score, "context_score": sc_score, "risk_score": risk_score, "label": label}
                 e_index += 1
         return return_value
 

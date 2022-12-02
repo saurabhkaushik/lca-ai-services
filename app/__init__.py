@@ -69,7 +69,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         #contract = preprocess.clean_input_text(contract)    
         print('Contract : \n', contract)
         model = class_service.load_model(domain)
-        response = class_service.process_contract_request(contract, model)
+        response = class_service.process_contract_request(contract, model, domain)
         dbutil.update_contracts_id(contract_id, contract_data['title'], contract, str(response))
         json_response = jsonify(response)
         print("Response : \n", response)
@@ -112,7 +112,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         for domain in domains:
             model = class_service.load_model(domain)
             answer_results = class_service.process_contract_request(
-                contract, model)
+                contract, model, domain)
             print("Contract Analysis : ", answer_results)
         return jsonify(answer_results)
 

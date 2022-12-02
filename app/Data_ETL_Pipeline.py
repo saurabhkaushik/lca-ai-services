@@ -3,6 +3,7 @@ from app.Data_Loader import Data_Loader
 from app.TextRank_Extractor import TextRank_Extractor
 from app.Keyword_Classifier import Keyword_Classifier
 from app.common.MySQLUtility import MySQLUtility
+from app.Risk_Score_Service import Risk_Score_Service
 
 class Data_ETL_Pipeline(object):
     dbutil = None
@@ -11,6 +12,7 @@ class Data_ETL_Pipeline(object):
     key_classifier = None
     class_service = None
     domains = []
+    risk_class = None
 
     def __init__(self, dbutil, domains):
         self.dbutil = dbutil
@@ -18,7 +20,8 @@ class Data_ETL_Pipeline(object):
         self.data_load = Data_Loader(self.dbutil)
         self.textrank = TextRank_Extractor(self.dbutil)
         self.key_classifier = Keyword_Classifier(self.dbutil)
-        self.class_service = Transformer_Classifier(self.dbutil)
+        self.class_service = Transformer_Classifier(self.dbutil, self.domains)
+        self.risk_class = Risk_Score_Service(self.dbutil)
         pass    
 
     def create_dataset(self):
@@ -64,6 +67,9 @@ class Data_ETL_Pipeline(object):
 
             print("class_service.process_contract_training_data_eval():" + domain)
             self.class_service.process_contract_training_data_eval(domain)
+
+        print("risk_class.process_keyword_polarity():" , self.domains)
+        self.risk_class.process_keyword_polarity(self.domains)
 
     def evaluate_results(self):
         for domain in self.domains:

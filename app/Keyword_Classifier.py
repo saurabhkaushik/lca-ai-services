@@ -10,7 +10,6 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 
 from app.common.MySQLUtility import MySQLUtility
 from app.PreProcessText import PreProcessText
-from app.Risk_Score_Service import Risk_Score_Service
 
 # load the dataset
 pre_process = PreProcessText()
@@ -19,10 +18,8 @@ keyword_threshold = 80
 
 class Keyword_Classifier:
     dbutil = None 
-    risk_score = None
     def __init__(self, dbutil):
         self.dbutil = dbutil
-        self.risk_score = Risk_Score_Service(dbutil)
         pass
 
     trainDF = pd.DataFrame()
@@ -121,6 +118,7 @@ class Keyword_Classifier:
         self.dbutil.save_training_data_batch(batch_insert)
         return
 
+''' 
     def process_seed_data(self, domain):
         results = self.dbutil.get_training_data(domain, type="seed")
         type = "seed"
@@ -144,5 +142,5 @@ class Keyword_Classifier:
                     batch_insert.append(insert_json)
         self.dbutil.update_training_data_batch(batch_insert)
         return
-
+'''
 
