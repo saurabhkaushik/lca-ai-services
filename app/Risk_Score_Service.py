@@ -2,9 +2,11 @@ from transformers import pipeline
 from app.PreProcessText import PreProcessText
 import json 
 preprocess = PreProcessText()
+import re
 
 sentiment_model = "distilbert-base-uncased-finetuned-sst-2-english"
 polarity_file = './data/key_polarity.json'
+polarity_accuracy = 'high' # 'high'/'low'
 
 class Risk_Score_Service:
     sentiment_pipeline = pipeline(
@@ -28,30 +30,31 @@ class Risk_Score_Service:
         #print (sent_result)
         sent_score = (
             sent_result[0]['score']) if sent_result[0]['label'] == 'POSITIVE' else -(sent_result[0]['score'])
-        sent_score = sent_score * 100
+        sent_score = int (sent_score * 100)
         return sent_score
     
     def get_context_score(self, text, domain): 
         context_score = 0
+        count = 0
         sem_score = self.get_sentiment_score(text)
         text_lem = preprocess.get_lemmantizer(text)     
         key_polarity = self.domain_key_polarity[domain]   
-
-        for key_dic in key_polarity:
-            if key_dic['name'] in text_lem:            
+        for key_dic in key_polarity:            
+            if key_dic['name'] in text_lem:  
                 pol_score = key_dic['polarity']
-                if pol_score >=0 and sem_score >= 0:
-                    context_score = pol_score
-                elif pol_score >=0 and sem_score < 0:
-                    context_score = -pol_score
-                elif pol_score < 0 and sem_score >= 0:
-                    context_score = pol_score
-                elif pol_score < 0 and sem_score < 0:
-                    context_score = -pol_score
-            else: 
-                context_score = self.get_sentiment_score(text)
+                if sem_score >= 0:
+                    context_score += pol_score
+                else:
+                    context_score += -pol_score
+                count += 1
+                if polarity_accuracy == 'low':
+                    break # TODO: Ideally take average of all keyword's polarity 
+        if not count == 0:
+            context_score = int (context_score / count)
 
-        print ('get_context_score : ', text, context_score)
+        if context_score == 0: 
+            context_score = self.get_sentiment_score(text)
+        #print ('Test 3')
         return context_score
 
     def process_keyword_polarity(self, domains):         
@@ -77,7 +80,9 @@ class Risk_Score_Service:
                             key_dic['count'] += 1
 
             for key_dic in key_polarity:
-                if not key_dic['count'] == 0:
+                if key_dic['count'] == 0:
+                    key_polarity.remove(key_dic)
+                else:
                     key_dic['polarity'] = int((key_dic['score']) / key_dic['count'])
             
             self.domain_key_polarity[domain] = key_polarity

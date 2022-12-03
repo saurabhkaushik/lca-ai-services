@@ -20,7 +20,7 @@ class Data_ETL_Pipeline(object):
         self.data_load = Data_Loader(self.dbutil)
         self.textrank = TextRank_Extractor(self.dbutil)
         self.key_classifier = Keyword_Classifier(self.dbutil)
-        self.class_service = Transformer_Classifier(self.dbutil, self.domains)
+        self.class_service = Transformer_Classifier(self.dbutil)
         self.risk_class = Risk_Score_Service(self.dbutil)
         pass    
 

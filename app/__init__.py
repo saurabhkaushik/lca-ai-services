@@ -8,6 +8,7 @@ from app.Transformer_Classifier import Transformer_Classifier
 from app.common.MySQLUtility import MySQLUtility
 from app.common.GCP_Storage import GCP_Storage
 from app.Data_ETL_Pipeline import Data_ETL_Pipeline
+from app.Risk_Score_Service import Risk_Score_Service
 
 def create_app(config, debug=False, testing=False, config_overrides=None):
     apps = Flask(__name__)
@@ -42,11 +43,23 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
 
     dbutil = MySQLUtility(db_host, db_user, db_password, db_name)
     class_service = Transformer_Classifier(dbutil)
+    risk_scorer = Risk_Score_Service(dbutil)
+
+    print ('Loading DB Connection Pool...')
+    dbutil.get_connection()
+
+    print ('Loading AI Models...')
+    class_service.preload_models(domains)
+
+    print ('Loading Keyword Polarity Data...')
+    risk_scorer.load_polarity_data()
 
     if data_env == 'cloud': 
         print ('Updating Model from initialization.')
         gcp_store = GCP_Storage(domains)
         gcp_store.download_models()
+    
+    print ('\nAll Pre-Loading Completed. \n')
 
     @apps.route('/')  
     def index():

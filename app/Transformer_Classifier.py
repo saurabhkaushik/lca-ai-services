@@ -22,8 +22,9 @@ class Transformer_Classifier:
     label_x = dict()
     risk_score = None
     tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
-
+    model_dict = None
     dbutil = None 
+
     def __init__(self, dbutil):
         self.dbutil = dbutil
         self.risk_score = Risk_Score_Service(dbutil)        
@@ -72,9 +73,19 @@ class Transformer_Classifier:
         valid_hg = Dataset(pa.Table.from_pandas(valid_df))
         return train_hg, valid_hg
 
+    def preload_models(self, domains):
+        self.model_dict = {}
+        for domain in domains:
+            self.model_dict[domain] = AutoModelForSequenceClassification.from_pretrained('./model/' + domain + '/')
+        return 
+
     def load_model(self, domain):
-        model = AutoModelForSequenceClassification.from_pretrained('./model/' + domain + '/')
-        return model
+        if self.model_dict:
+            return self.model_dict[domain]
+        else: 
+            self.model_dict[domain] = {}
+            self.model_dict[domain] = AutoModelForSequenceClassification.from_pretrained('./model/' + domain + '/')
+            return self.model_dict[domain]
 
     def training(self, domain):
         try: 
@@ -127,7 +138,7 @@ class Transformer_Classifier:
                 c_score = (self.risk_score.get_context_score(c_sentence, domain))
                 sc_score = int (50 + (c_score / 2))
                 risk_score = int ((p_score + sc_score) / 2)
-                return_value[e_index] = {"start_index": start_i, "end_index": end_i, "sentence" : c_sentence, 
+                return_value[e_index] = {"sentence" : c_sentence, 
                                          "presence_score": p_score, "context_score": sc_score, "risk_score": risk_score, "label": label}
                 e_index += 1
         return return_value
