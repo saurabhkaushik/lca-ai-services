@@ -74,7 +74,13 @@ class MySQLUtility(object):
                 print("DB Pool Created.")
             self.connection_pool = self.connect
 
-        connection = self.connect.get_connection()    
+        connection = self.connect.get_connection()   
+
+        if not connection.is_connected(): 
+            print('DB Connection Error: ')
+            self.connect = None 
+            return None 
+            
         return connection
         
 

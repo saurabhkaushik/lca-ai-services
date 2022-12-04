@@ -47,6 +47,7 @@ class PreProcessText(object):
 
     def preprocess_text(self, sentence):
         sentence = str(sentence)
+        # Lower Case 
         sentence = sentence.lower()
 
         # HTML CLEAN
@@ -58,17 +59,16 @@ class PreProcessText(object):
         # Number Clean
         rem_num = re.sub('[0-9]+', '', rem_url)
 
-        #print (rem_num)
+        # Stop Words
         doc = self.nlp(rem_num)
         stop_words = [token.text for token in doc if not token.is_stop]
         stop_text = " ".join(stop_words).strip()
 
-        #print (stop_text)
+        # Lemmentize 
         doc = self.nlp(stop_text)
         lemma_words = [token.lemma_ for token in doc]
         lem_text = " ".join(lemma_words).strip()
 
-        #print (lem_text)
         return lem_text
 
     def get_lemmantizer(self, text): 
