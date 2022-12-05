@@ -76,7 +76,10 @@ class Transformer_Classifier:
     def preload_models(self, domains):
         self.model_dict = {}
         for domain in domains:
-            self.model_dict[domain] = AutoModelForSequenceClassification.from_pretrained('./model/' + domain + '/')
+            try:
+                self.model_dict[domain] = AutoModelForSequenceClassification.from_pretrained('./model/' + domain + '/')
+            except Exception as e: 
+                print ('Could not load AI Models', e)
         return 
 
     def load_model(self, domain):

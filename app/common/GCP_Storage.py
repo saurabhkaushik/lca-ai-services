@@ -6,23 +6,19 @@ class GCP_Storage(object):
 
     model_folder = './model/'
     seed_folder = './data/'
-    model_bucket = 'lca_model'
-    seed_bucket = 'lca_seed'
-
+    project_bucket = None
     domains = []
 
-    def __init__(self, domains):
+    def __init__(self, domains, storage_bucket):
         self.domains = domains
         self.storage_client = storage.Client()
+        self.project_bucket = storage_bucket
         pass
 
     def setup_bucket(self):
         storage_client = storage.Client()
-        if not storage_client.bucket(self.seed_bucket).exists():
-            bucket = storage_client.create_bucket(self.seed_bucket)
-            print(f"Bucket {bucket.name} created.")
-        if not storage_client.bucket(self.model_bucket).exists():
-            bucket = storage_client.create_bucket(self.model_bucket)
+        if not storage_client.bucket(self.project_bucket).exists():
+            bucket = storage_client.create_bucket(self.project_bucket)
             print(f"Bucket {bucket.name} created.")
         return None
     
@@ -46,6 +42,17 @@ class GCP_Storage(object):
         )
         return contents
     
+    def upload_models(self):     
+        print ('Uploading Models to GCP Bucket.')    
+        for domain in self.domains: 
+            model_domain_folder = self.model_folder + domain + '/'
+            filelist = os.listdir(model_domain_folder)            
+            for file_name in filelist: 
+                src_file_url = model_domain_folder + file_name 
+                file_name = 'model/' + domain + '/' + file_name
+                self.upload_blob(self.project_bucket, src_file_url, file_name)
+                print(f"Uploaded {file_name}.")
+
     def download_models(self):      
         print ('Downloading Models from GCP Bucket.')  
         for domain in self.domains: 
@@ -55,41 +62,32 @@ class GCP_Storage(object):
             except OSError as error: 
                 print(error) 
 
-        blobs = self.storage_client.list_blobs(self.model_bucket)
+            blobs = self.storage_client.list_blobs(self.project_bucket, prefix='model/' + domain + '/', delimiter='/')
 
-        for blob in blobs:                           
-            dest_file_url = self.model_folder + blob.name               
-            print (self.model_bucket, blob.name, dest_file_url)
-            self.download_blob(self.model_bucket, blob.name, dest_file_url)
+            for blob in blobs:                           
+                dest_file_url = './' + blob.name               
+                print (self.project_bucket, blob.name, dest_file_url)
+                self.download_blob(self.project_bucket, blob.name, dest_file_url)
         return 
 
-    def upload_models(self):     
-        print ('Uploading Models to GCP Bucket.')    
-        for domain in self.domains: 
-            model_domain_folder = self.model_folder + domain + '/'
-            filelist = os.listdir(model_domain_folder)            
-            for file_name in filelist: 
-                src_file_url = model_domain_folder + file_name 
-                file_name = domain + '/' + file_name
-                self.upload_blob(self.model_bucket, src_file_url, file_name)
-                print(f"Uploaded {file_name}.")
-    
+''' 
     def download_seed_data(self):   
         print ('Downloading Seeds from GCP Bucket.')     
-        blobs = self.storage_client.list_blobs(self.seed_bucket)
+        blobs = self.storage_client.list_blobs(self.project_bucket, 'data/', delimiter='/')
         try: 
             os.makedirs(self.seed_folder) 
         except OSError as error: 
             print(error) 
         for blob in blobs:          
             dest_file_url = self.seed_folder + blob.name 
-            self.download_blob(self.seed_bucket, blob.name, dest_file_url)
+            self.download_blob(self.project_bucket, blob.name, dest_file_url)
 
     def upload_seed_data(self):      
         print ('Uploading Seeds to GCP Bucket.')  
         filelist = os.listdir(self.seed_folder)            
         for file_name in filelist: 
             if file_name.endswith(".csv"):
-                src_file_url = self.seed_folder + file_name 
-                self.upload_blob(self.seed_bucket, src_file_url, file_name)
+                src_file_url = 'data/' + self.seed_folder + file_name 
+                self.upload_blob(self.project_bucket, src_file_url, file_name)
                 print(f"Uploaded {file_name}.") 
+'''

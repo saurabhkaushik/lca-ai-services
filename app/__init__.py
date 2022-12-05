@@ -31,6 +31,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     db_password = apps.config['DB_PASSWORD']
     db_name = apps.config['DB_NAME']
     data_env = apps.config['DATA_ENV']
+    storage_bucket_env = apps.config['STORAGE_BUCKET']
     
     if config_overrides:
         apps.config.update(config_overrides)
@@ -54,9 +55,12 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     print ('Loading Keyword Polarity Data...')
     risk_scorer.load_polarity_data()
 
+    print ('Setting up Storage Bucket...')
+    gcp_store = GCP_Storage(domains, storage_bucket_env)
+    gcp_store.setup_bucket()
+
     if data_env == 'cloud': 
-        print ('Updating Model from initialization.')
-        gcp_store = GCP_Storage(domains)
+        print ('Updating Model from initialization.')        
         gcp_store.download_models()
     
     print ('\nAll Pre-Loading Completed. \n')
@@ -96,25 +100,25 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     
     @apps.route('/etl_service', methods=('GET', 'POST'))
     def etl_service():
-        data_etl = Data_ETL_Pipeline(dbutil, domains)
+        data_etl = Data_ETL_Pipeline(dbutil, domains, storage_bucket_env)
         data_etl.start_process()
         return render_template('index.html')
     
     @apps.route('/get_seed_service', methods=('GET', 'POST'))
     def get_seed_service():
-        store_util = GCP_Storage(domains)
+        store_util = GCP_Storage(domains, storage_bucket_env)
         store_util.download_seed_data()
         return render_template('index.html')
     
     @apps.route('/get_model_service', methods=('GET', 'POST'))
     def get_model_service():
-        store_util = GCP_Storage(domains)
+        store_util = GCP_Storage(domains, storage_bucket_env)
         store_util.download_models()
         return render_template('index.html')
     
     @apps.route('/put_model_service', methods=('GET', 'POST'))
     def put_model_service():
-        store_util = GCP_Storage(domains)
+        store_util = GCP_Storage(domains, storage_bucket_env)
         store_util.upload_models()
         return render_template('index.html')
 

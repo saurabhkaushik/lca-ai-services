@@ -1,9 +1,0 @@
-{
-    "train" : [
-        {"sentence": "Broadcasting, Licensing and Wireless referred to ", "label" : "positive", "idx" : 0},
-        {"sentence": "Licensing and Wireless are referred to ", "label" : "negative", "idx" : 1},
-        {"sentence": "Broadcasting, Licensing and  are referred to ", "label" : "positive", "idx" : 2},
-        {"sentence": "Broadcasting, Licensing and Wireless are referred to ", "label" : "negative", "idx" : 3},
-        {"sentence": "Broadcasting, Licensing and Wireless are  to ", "label" : "positive", "idx" : 4}
-    ]
-}

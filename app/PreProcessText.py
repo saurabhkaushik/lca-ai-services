@@ -1,7 +1,6 @@
 import re
 import string
 import pytextrank # TextRank 
-
 import spacy
 
 class PreProcessText(object):
@@ -53,23 +52,32 @@ class PreProcessText(object):
         # HTML CLEAN
         sentence = sentence.replace('{html}', "")
         cleanr = re.compile('<.*?>')
-        cleantext = re.sub(cleanr, '', sentence)
-        rem_url = re.sub(r'http\S+', '', cleantext)
+        sentence = re.sub(cleanr, '', sentence)
+        sentence = re.sub(r'http\S+', '', sentence)
+        #sentence = re.sub("https?:\/\/.*[\r\n]*", "", sentence)
+        sentence = re.sub("@\S+", "", sentence)
+        sentence = re.sub("\$", "", sentence)
+
+        # Unicode Text 
+        ''' text_encode = sentence.encode(encoding="ascii", errors="ignore")
+        text_decode = text_encode.decode()
+        sentence = " ".join([word for word in text_decode.split()])
+        ''' 
 
         # Number Clean
-        rem_num = re.sub('[0-9]+', '', rem_url)
+        sentence = re.sub('[0-9]+', '', sentence)
 
         # Stop Words
-        doc = self.nlp(rem_num)
+        doc = self.nlp(sentence)
         stop_words = [token.text for token in doc if not token.is_stop]
-        stop_text = " ".join(stop_words).strip()
+        sentence = " ".join(stop_words).strip()
 
         # Lemmentize 
-        doc = self.nlp(stop_text)
+        doc = self.nlp(sentence)
         lemma_words = [token.lemma_ for token in doc]
-        lem_text = " ".join(lemma_words).strip()
+        sentence = " ".join(lemma_words).strip()
 
-        return lem_text
+        return sentence
 
     def get_lemmantizer(self, text): 
         doc = self.nlp(text)
@@ -79,20 +87,7 @@ class PreProcessText(object):
 
     def clean_text(self, article_text):
         rem_num = re.sub('[0-9]+', '', article_text)
-        #print("Cleaner Text: ", article_text, rem_num)
         return rem_num
-
-    def clean_input_text(self, text): 
-        #text = text.replace("@#$%^&*()[]\r\n`~-=_+", "") # @#$%^&*()[]{};:/<>\|`~-=_+
-        #text = text.replace('\n','')
-        #text = text.replace('\r', '')
-        '''escaped = text.translate(str.maketrans({"'":  r"\'",
-                                          "\"":  r"\"",
-                                          "^":  r"\^",
-                                          "$":  r"\$",
-                                          "*":  r"\*"}))'''
-
-        return text
 
     def get_sentences(self, article_text):
         sentences = self.get_sentences_spacy(article_text)

@@ -7,9 +7,9 @@ from mysql.connector.constants import ClientFlag
 
 db_config = {
     'client_flags': [ClientFlag.SSL],
-    'ssl_ca': './store/sqldb/server-ca.pem',
-    'ssl_cert': './store/sqldb/client-cert.pem',
-    'ssl_key': './store/sqldb/client-key.pem',
+    'ssl_ca': './config/sqldb/server-ca.pem',
+    'ssl_cert': './config/sqldb/client-cert.pem',
+    'ssl_key': './config/sqldb/client-key.pem',
 }
 
 schema_contract_data = "CREATE TABLE IF NOT EXISTS contract_data (" + \
@@ -391,10 +391,7 @@ class MySQLUtility(object):
     def delete_training_data_id(self, id):
         cnxn = self.get_connection()
         cursor = cnxn.cursor()
-
-        cnxn = mysql.connector.connect(**config2)
-        cursor = cnxn.cursor()
-
+        
         uuid_query = "Delete from " + self.table_id3 + " where id = \'" + id + "\'"
         cursor.execute(uuid_query)
         print(cursor.statement)
