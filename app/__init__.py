@@ -21,7 +21,6 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         apps.config.from_object(config.DevelopmentConfig)
         print('Envornment: ', app_env)
 
-    apps.config.from_object(config.DevelopmentConfig)
     apps.debug = debug
     apps.testing = testing
 
@@ -43,20 +42,20 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     logging.getLogger().setLevel(logging.INFO)
 
     dbutil = MySQLUtility(db_host, db_user, db_password, db_name)
-    class_service = Transformer_Classifier(dbutil)
-    risk_scorer = Risk_Score_Service(dbutil)
+    class_service = Transformer_Classifier(dbutil, domains)
+    risk_scorer = Risk_Score_Service(dbutil, domains)
+    gcp_store = GCP_Storage(domains, storage_bucket_env)
 
     print ('Loading DB Connection Pool...')
     dbutil.get_connection()
 
     print ('Loading AI Models...')
-    class_service.preload_models(domains)
+    class_service.preload_models()
 
     print ('Loading Keyword Polarity Data...')
     risk_scorer.load_polarity_data()
 
     print ('Setting up Storage Bucket...')
-    gcp_store = GCP_Storage(domains, storage_bucket_env)
     gcp_store.setup_bucket()
 
     if data_env == 'cloud': 
@@ -85,8 +84,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         contract = contract_data['content'] 
         #contract = preprocess.clean_input_text(contract)    
         print('Contract : \n', contract)
-        model = class_service.load_model(domain)
-        response = class_service.process_contract_request(contract, model, domain)
+        response = class_service.process_contract_request(contract, domain)
         dbutil.update_contracts_id(contract_id, contract_data['title'], contract, str(response))
         json_response = jsonify(response)
         print("Response : \n", response)
@@ -95,12 +93,13 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     @apps.route('/training_service', methods=('GET', 'POST'))
     def training_service():
         for domain in domains:
+            class_service.prepare_train_dataset(domain)
             class_service.training(domain)
         return render_template('index.html')
     
     @apps.route('/etl_service', methods=('GET', 'POST'))
     def etl_service():
-        data_etl = Data_ETL_Pipeline(dbutil, domains, storage_bucket_env)
+        data_etl = Data_ETL_Pipeline(dbutil, domains)
         data_etl.start_process()
         return render_template('index.html')
     
@@ -127,9 +126,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         contract = "This is a very legalised way of doing businesss."
         answer_results = {}
         for domain in domains:
-            model = class_service.load_model(domain)
-            answer_results = class_service.process_contract_request(
-                contract, model, domain)
+            answer_results = class_service.process_contract_request(contract, domain)
             print("Contract Analysis : ", answer_results)
         return jsonify(answer_results)
 

@@ -16,6 +16,7 @@ gcloud container clusters get-credentials "autopilot-cluster-2" --region asia-so
 kubectl rollout restart deployment lca-service-app-gke
 #kubectl apply -f deployment.yaml 
 #kubectl apply -f service.yaml
+#docker system prune
 
 # Validation 
 kubectl get deployments

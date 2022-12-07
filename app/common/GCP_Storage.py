@@ -1,5 +1,6 @@
 from google.cloud import storage
 import os 
+import logging
 
 class GCP_Storage(object): 
     storage_client = None
@@ -60,7 +61,7 @@ class GCP_Storage(object):
             try: 
                 os.makedirs(dest_folder) 
             except OSError as error: 
-                print(error) 
+                logging.exception('File creation error.')
 
             blobs = self.storage_client.list_blobs(self.project_bucket, prefix='model/' + domain + '/', delimiter='/')
 

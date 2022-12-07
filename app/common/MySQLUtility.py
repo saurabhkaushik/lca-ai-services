@@ -1,6 +1,7 @@
 import uuid
 from mysql.connector import pooling
 import datetime
+import logging
 
 import mysql.connector
 from mysql.connector.constants import ClientFlag
@@ -69,7 +70,7 @@ class MySQLUtility(object):
                                                             pool_reset_session=True,
                                                             **db_config)
             except mysql.connector.Error as err:
-                print('DB Connection Error: ', err)
+                logging.exception('DB Connection Error: ')
             finally:
                 print("DB Pool Created.")
             self.connection_pool = self.connect
@@ -90,21 +91,21 @@ class MySQLUtility(object):
         try:
             cursor.execute(schema_contract_data)
         except mysql.connector.Error as err:
-            print("Something went wrong: {}".format(err))
+            logging.exception("Something went wrong: {}".format(err))
         else:
             print('Table contract_data successfully created.')
 
         try:
             cursor.execute(schema_seed_data)
         except mysql.connector.Error as err:
-            print("Something went wrong: {}".format(err))
+            logging.exception("Something went wrong: {}".format(err))
         else:
             print('Table seed_data successfully created.')
 
         try:
             cursor.execute(schema_training_data)
         except mysql.connector.Error as err:
-            print("Something went wrong: {}".format(err))
+            logging.exception("Something went wrong: {}".format(err))
         else:
             print('Table training_data successfully created.')
 
@@ -119,19 +120,19 @@ class MySQLUtility(object):
         try:
             cursor.execute('DROP table contract_data')
         except mysql.connector.Error as err:
-            print("Something went wrong: {}".format(err))
+            logging.exception("Something went wrong: {}".format(err))
         else:
             print('Table contract_data successfully deleted.')
         try:
             cursor.execute('DROP table seed_data')
         except mysql.connector.Error as err:
-            print("Something went wrong: {}".format(err))
+            logging.exception("Something went wrong: {}".format(err))
         else:
             print('Table seed_data successfully deleted.')
         try:
             cursor.execute('DROP table training_data')
         except mysql.connector.Error as err:
-            print("Something went wrong: {}".format(err))
+            logging.exception("Something went wrong: {}".format(err))
         else:
             print('Table training_data successfully deleted.')
 
@@ -146,7 +147,8 @@ class MySQLUtility(object):
 
         uuid_query = "Select * from contract_data" + " where domain=\'" + domain + '\';'
         cursor.execute(uuid_query)
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         results = cursor.fetchall()
 
@@ -159,7 +161,9 @@ class MySQLUtility(object):
 
         uuid_query = "Select * from contract_data where id =\"" + id + "\""
         cursor.execute(uuid_query)
-        print(cursor.statement)
+
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         results = cursor.fetchall()
 
@@ -184,7 +188,8 @@ class MySQLUtility(object):
             rows_to_insert.append(insert_str)
 
         cursor.executemany(insert_stmt, rows_to_insert)
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -200,7 +205,8 @@ class MySQLUtility(object):
         val = (response, title, content, id)
 
         cursor.execute(uuid_query, val)
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -213,7 +219,8 @@ class MySQLUtility(object):
 
         uuid_query = "Delete from " + self.table_id1 + " where id = \'" + id + "\'"
         cursor.execute(uuid_query)
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -228,7 +235,8 @@ class MySQLUtility(object):
         uuid_query = "SELECT * from " + self.table_id2 + " where domain=\'" + domain + '\';'
         cursor.execute(uuid_query)
         results = cursor.fetchall()
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         cnxn.close()
         return results
@@ -240,7 +248,8 @@ class MySQLUtility(object):
         uuid_query = "SELECT * from " + self.table_id2 + " where id = \'" + id + "\'"
         cursor.execute(uuid_query)
         results = cursor.fetchall()
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         cnxn.close()
         return results
@@ -261,7 +270,8 @@ class MySQLUtility(object):
             rows_to_insert.append(insert_set)
 
         cursor.executemany(insert_stmt, rows_to_insert)
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -275,7 +285,8 @@ class MySQLUtility(object):
         uuid_query = "UPDATE " + self.table_id2 + " SET keywords = %s where id = %s;"
         val = (keywords, id)
         cursor.execute(uuid_query, val)
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -294,7 +305,8 @@ class MySQLUtility(object):
             rows_to_insert.append(insert_stmt)
 
         cursor.executemany(uuid_query, rows_to_insert)
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -307,7 +319,8 @@ class MySQLUtility(object):
 
         uuid_query = "Delete from " + self.table_id2 + " where id = \'" + id + "\'"
         cursor.execute(uuid_query)
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -324,7 +337,8 @@ class MySQLUtility(object):
             uuid_query = "SELECT * from " + self.table_id3 + " where type=\'" + type + "\'" + " and domain=\'" + domain + '\';'
         print('Query: ', uuid_query)
         cursor.execute(uuid_query)
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         results = cursor.fetchall()
 
@@ -337,7 +351,8 @@ class MySQLUtility(object):
 
         uuid_query = "SELECT * from " + self.table_id3 + " where id = \'" + id + "\'"
         cursor.execute(uuid_query)
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         results = cursor.fetchall()
 
@@ -360,7 +375,8 @@ class MySQLUtility(object):
             rows_to_insert.append(insert_set)
 
         cursor.executemany(insert_stmt, rows_to_insert)
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -381,7 +397,8 @@ class MySQLUtility(object):
                            row['eval_score'], row['id'])
             rows_to_insert.append(insert_stmt)
         cursor.executemany(uuid_query, rows_to_insert)
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()
@@ -394,7 +411,8 @@ class MySQLUtility(object):
         
         uuid_query = "Delete from " + self.table_id3 + " where id = \'" + id + "\'"
         cursor.execute(uuid_query)
-        print(cursor.statement)
+        if cursor.rowcount > 0:
+            print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()

@@ -24,10 +24,14 @@ class Transformer_Classifier:
     tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
     model_dict = None
     dbutil = None 
+    domains = None
+    train_hg = None
+    valid_hg = None
 
-    def __init__(self, dbutil):
+    def __init__(self, dbutil, domains):
         self.dbutil = dbutil
-        self.risk_score = Risk_Score_Service(dbutil)        
+        self.domains = domains
+        self.risk_score = Risk_Score_Service(dbutil, domains)        
         pass
 
     def process_data(self, row):
@@ -69,34 +73,25 @@ class Transformer_Classifier:
             random_state=2022
         )
 
-        train_hg = Dataset(pa.Table.from_pandas(train_df))
-        valid_hg = Dataset(pa.Table.from_pandas(valid_df))
-        return train_hg, valid_hg
+        self.train_hg = Dataset(pa.Table.from_pandas(train_df))
+        self.valid_hg = Dataset(pa.Table.from_pandas(valid_df))
+        return 
 
-    def preload_models(self, domains):
+    def preload_models(self):
         self.model_dict = {}
-        for domain in domains:
+        for domain in self.domains:
             try:
                 self.model_dict[domain] = AutoModelForSequenceClassification.from_pretrained('./model/' + domain + '/')
             except Exception as e: 
-                print ('Could not load AI Models', e)
+                logging.exception('Could not load AI Models')
         return 
 
     def load_model(self, domain):
-        if self.model_dict:
-            return self.model_dict[domain]
-        else: 
-            self.model_dict[domain] = {}
-            self.model_dict[domain] = AutoModelForSequenceClassification.from_pretrained('./model/' + domain + '/')
-            return self.model_dict[domain]
+        if not self.model_dict:
+            self.preload_models()
+        return self.model_dict[domain]
 
     def training(self, domain):
-        try: 
-            train_hg, valid_hg = self.prepare_train_dataset(domain)
-        except Exception as e: 
-            logging.error(traceback.format_exc())
-            return
-
         training_args = TrainingArguments(
             output_dir="./result", evaluation_strategy="epoch")
         id2label = self.label_x
@@ -109,8 +104,8 @@ class Transformer_Classifier:
         trainer = Trainer(
             model=model,
             args=training_args,
-            train_dataset=train_hg,
-            eval_dataset=valid_hg,
+            train_dataset=self.train_hg,
+            eval_dataset=self.valid_hg,
             tokenizer=self.tokenizer
         )
         trainer.train()
@@ -125,7 +120,8 @@ class Transformer_Classifier:
         results = classifier(sentences)
         return results
 
-    def process_contract_request(self, article_text, model, domain):
+    def process_contract_request(self, article_text, domain):
+        model = self.load_model(domain)
         return_value = {}
         sentences = processTxt.get_sentences(article_text)
         self.risk_score.load_polarity_data()
@@ -138,11 +134,10 @@ class Transformer_Classifier:
                 results = self.predict(c_sentence, model)
                 label = results[0]["label"]
                 p_score = int (results[0]["score"] * 100)
-                c_score = (self.risk_score.get_context_score(c_sentence, domain))
-                sc_score = int (50 + (c_score / 2))
-                risk_score = int ((p_score + sc_score) / 2)
+                c_score = (self.risk_score.get_context_score(c_sentence, domain))                
+                risk_score = int ((p_score + c_score) / 2)
                 return_value[e_index] = {"sentence" : c_sentence, 
-                                         "presence_score": p_score, "context_score": sc_score, "risk_score": risk_score, "label": label}
+                                         "presence_score": p_score, "context_score": c_score, "risk_score": risk_score, "label": label}
                 e_index += 1
         return return_value
 

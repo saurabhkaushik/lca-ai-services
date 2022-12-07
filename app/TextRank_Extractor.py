@@ -17,9 +17,11 @@ class TextRank_Extractor:
         for phrase in doc._.phrases:
             str_key = pre_process.token_words(text=phrase.text)
             stringkeyword = " ".join(str_key)
-            if len(stringkeyword) > 0:
+            if len(stringkeyword) > int(min_sentence_len / 2):
                 stringkeyword = pre_process.preprocess_text(stringkeyword)
-                keyword.append(stringkeyword.lower().strip())
+                strkey = stringkeyword.lower().strip()
+                if len (strkey) > int(min_sentence_len / 2):
+                    keyword.append(strkey)
         res = sorted(
             set(keyword), key=lambda x: keyword.count(x), reverse=True)
         return res
@@ -36,7 +38,7 @@ class TextRank_Extractor:
                     stmt = str(stmt['sentance'])
                     if len(stmt) > min_sentence_len:
                         keywords = self.text_rank(stmt)
-                        keywords = ", ".join(keywords)
+                        keywords = ", ".join(keywords).strip()
                         if len(keywords) > int(min_sentence_len / 2):
                             query_json = {"id": id, "keywords": keywords}
                             batch_update.append(query_json)

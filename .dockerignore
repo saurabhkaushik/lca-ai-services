@@ -25,5 +25,7 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 README.md
-result
-env
+**/result
+**/env
+**/notebooks
+**/store
