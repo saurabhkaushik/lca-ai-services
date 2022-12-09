@@ -3,6 +3,8 @@ from app.PreProcessText import PreProcessText
 import json 
 preprocess = PreProcessText()
 import re
+from os.path import exists
+import logging
 
 sentiment_model = "distilbert-base-uncased-finetuned-sst-2-english"
 polarity_folder = './data/' 
@@ -25,8 +27,11 @@ class Risk_Score_Service(object):
     def load_polarity_data(self):
         for domain in self.domains:
             if not domain in self.domain_key_polarity.keys():
-                with open(polarity_folder + domain + file_name) as json_file:
-                    self.domain_key_polarity[domain] = json.load(json_file)
+                if exists(polarity_folder + domain + file_name ):
+                    with open(polarity_folder + domain + file_name) as json_file:
+                        self.domain_key_polarity[domain] = json.load(json_file)
+                else: 
+                    logging.error('Polarity File is Missing.' + ' : ' + domain)
         return 
 
     def get_sentiment_score(self, sentence):
@@ -46,7 +51,7 @@ class Risk_Score_Service(object):
         key_polarity = self.domain_key_polarity[domain]['keywords']   
         for key_dic in key_polarity:            
             if key_dic['name'] in text_lem:  
-                print('Polarity Word Found : \'', key_dic['name'] + '\'')
+                #print('Polarity Word Found : \'' + key_dic['name'] + '\'')
                 pol_score = key_dic['polarity']
                 if sem_score >= 0:
                     context_score += pol_score

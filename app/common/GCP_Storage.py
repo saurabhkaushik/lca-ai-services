@@ -10,10 +10,11 @@ class GCP_Storage(object):
     project_bucket = None
     domains = []
 
-    def __init__(self, domains, storage_bucket):
+    def __init__(self, domains, storage_bucket, mode):
         self.domains = domains
         self.storage_client = storage.Client()
         self.project_bucket = storage_bucket
+        self.model_folder += mode + '/'
         pass
 
     def setup_bucket(self):

@@ -1,6 +1,5 @@
 import logging
 import traceback
-
 import csv
 import os
 from app.PreProcessText import PreProcessText
@@ -21,10 +20,11 @@ class Data_Loader(object):
         batch_insert = []
         reports_folder = data_folder + 'reports/' + domain + '/'
         filelist = []
+        
         try:
             filelist = os.listdir(reports_folder)
         except Exception as e: 
-            logging.error(traceback.format_exc())
+            logging.info("Report Files Does not exists.")
             return None
         for file_name in filelist:
             if file_name.endswith(".txt"):

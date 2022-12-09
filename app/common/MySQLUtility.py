@@ -188,8 +188,8 @@ class MySQLUtility(object):
             rows_to_insert.append(insert_str)
 
         cursor.executemany(insert_stmt, rows_to_insert)
-        if cursor.rowcount > 0:
-            print(cursor.statement)
+        #if cursor.rowcount > 0:
+            #print(cursor.statement)
 
         cnxn.commit()
         cnxn.close()

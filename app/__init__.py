@@ -31,6 +31,10 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     db_name = apps.config['DB_NAME']
     data_env = apps.config['DATA_ENV']
     storage_bucket_env = apps.config['STORAGE_BUCKET']
+    mode = apps.config['APP_MODE']
+    print('App Mode:' + mode)
+    print('Data Env:' + data_env)
+    print('GCP Storage:' + storage_bucket_env)
     
     if config_overrides:
         apps.config.update(config_overrides)
@@ -42,9 +46,9 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     logging.getLogger().setLevel(logging.INFO)
 
     dbutil = MySQLUtility(db_host, db_user, db_password, db_name)
-    class_service = Transformer_Classifier(dbutil, domains)
+    class_service = Transformer_Classifier(dbutil, domains, mode)
     risk_scorer = Risk_Score_Service(dbutil, domains)
-    gcp_store = GCP_Storage(domains, storage_bucket_env)
+    gcp_store = GCP_Storage(domains, storage_bucket_env, mode)
 
     print ('Loading DB Connection Pool...')
     dbutil.get_connection()
@@ -99,26 +103,23 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     
     @apps.route('/etl_service', methods=('GET', 'POST'))
     def etl_service():
-        data_etl = Data_ETL_Pipeline(dbutil, domains)
+        data_etl = Data_ETL_Pipeline(dbutil, domains, mode)
         data_etl.start_process()
         return render_template('index.html')
     
     @apps.route('/get_seed_service', methods=('GET', 'POST'))
     def get_seed_service():
-        store_util = GCP_Storage(domains, storage_bucket_env)
-        store_util.download_seed_data()
+        gcp_store.download_seed_data()
         return render_template('index.html')
     
     @apps.route('/get_model_service', methods=('GET', 'POST'))
     def get_model_service():
-        store_util = GCP_Storage(domains, storage_bucket_env)
-        store_util.download_models()
+        gcp_store.download_models()
         return render_template('index.html')
     
     @apps.route('/put_model_service', methods=('GET', 'POST'))
     def put_model_service():
-        store_util = GCP_Storage(domains, storage_bucket_env)
-        store_util.upload_models()
+        gcp_store.upload_models()
         return render_template('index.html')
 
     @apps.route('/model_test_service', methods=('GET', 'POST'))

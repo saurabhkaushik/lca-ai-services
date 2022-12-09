@@ -1,0 +1,24 @@
+{ 
+    "test_data": [{"data" : "Twenty-five people have been arrested in raids across Germany on suspicion of plotting to overthrow the government. ", "label" : "NA"},
+    {"data" : "German reports say the group of far-right and ex-military figures planned to storm the parliament building, the Reichstag, and seize power.", "label" : "NA"},
+    {"data" : "A German man referred to as a prince called Heinrich XIII, 71, is alleged to have been central to their plans.", "label" : "NA"},
+    {"data" : "Among those arrested in 11 German states were two alleged ringleaders according to federal prosecutors." , "label" : "NA"},
+    {"data" : "We can see the company had $6 million in short-term debt for the period. ", "label" : "current liabilities"},
+    {"data" : "Accounts payable was broken up into two parts: merchandise payables totaling $1.674 billion, and other accounts payable and accrued liabilities totaling $2.739 billion. ", "label" : "current liabilities"},
+    {"data" : "Macy’s had $20 million in taxes payable. ", "label" : "current liabilities"},
+    {"data" : "Total liabilities for August 2019 were $4.439 billion, which was nearly unchanged compared to the $4.481 billion for the same accounting period from one year earlier. " , "label" : "current liabilities"},
+    {"data" : "Counter guarantees and guarantees that are given by the company.", "label" : "contingent liabilities"},
+    {"data" : "The company gives a certain guarantee to another stakeholder on behalf of their third party. or it can also be said as the guarantee performed by certain companies as a result of the contract.", "label" : "contingent liabilities"},
+    {"data" : "Product warranty is also given by the company.", "label" : "contingent liabilities"},
+    {"data" : "The company also gives a guarantee on behalf of the stakeholders.", "label" : "contingent liabilities"},
+    {"data" : "The company also issues a letter of credit.", "label" : "contingent liabilities"},
+    {"data" : "The examples also include the adverse judgment of the potential disputes." , "label" : "contingent liabilities"},
+    {"data" : "Long-term financial liabilities will fall under this category." , "label" : "non-current liabilities"},
+    {"data" : "It may arise from bond payable or bank loans which may be recorded in the balance sheet in the form of amortized cost. ", "label" : "non-current liabilities"},
+    {"data" : "There is a past or current liability which puts a firm under obligation.", "label" : "non-current liabilities"},
+    {"data" : "Liabilities are in the form of borrowing. ", "label" : "non-current liabilities"},
+    {"data" : "When such an obligation is settled, it will lead to a decrease in a firm's assets.", "label" : "non-current liabilities"},
+    {"data" : "Deferred tax liability qualifies as a non-current liability. A firm may use a straight-line method of depreciation for financial reporting. ", "label" : "non-current liabilities"},
+    {"data" : "Such liability is created when gains or revenue are reflected on the income statement as it becomes eligible to be taxed." , "label" : "non-current liabilities"}
+]
+}

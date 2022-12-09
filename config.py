@@ -14,6 +14,7 @@ class ProductionConfig(Config):
     DB_NAME = 'lca_prod'
     DATA_ENV = 'local'
     STORAGE_BUCKET = 'lca_prod'
+    APP_MODE= 'accuracy'
 
 class DevelopmentConfig(Config):
     FLASK_APP='src/app'
@@ -26,7 +27,7 @@ class DevelopmentConfig(Config):
     DB_NAME = 'lca_dev'
     DATA_ENV = 'local' 
     STORAGE_BUCKET = 'lca_dev'
-
+    APP_MODE= 'accuracy'
 
 class TestingConfig(Config):
     DATABASE_URI = 'sqlite:///:memory:'

@@ -2,8 +2,8 @@ import logging
 import traceback
 
 import pandas as pd
-from sklearn import naive_bayes
-from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
+from sklearn.linear_model import SGDClassifier
+from sklearn.feature_extraction.text import TfidfTransformer, TfidfVectorizer
 from joblib import dump, load
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
@@ -15,6 +15,7 @@ from app.PreProcessText import PreProcessText
 pre_process = PreProcessText()
 min_sentence_len = 10
 keyword_threshold = 80
+model_folder = './model/keyword/'
 
 class Keyword_Classifier:
     dbutil = None 
@@ -30,9 +31,11 @@ class Keyword_Classifier:
         results = self.dbutil.get_seed_data(domain)
         for row in results:
             keywords = row['keywords']
-            if (keywords != None and len(keywords)) > 0:
+            #keywords = row['content']
+            #keywords = pre_process.preprocess_text(keywords)
+            if (keywords != None and len(keywords)) > 5:
                 labels.append(row['label'])
-                texts.append(row['keywords'])
+                texts.append(keywords)
 
         # create a dataframe using texts and lables
         self.trainDF = pd.DataFrame()
@@ -40,11 +43,11 @@ class Keyword_Classifier:
         self.trainDF['label'] = labels
         print (self.trainDF['label'])
 
-    def train_model(self, domain):
+    def training(self, domain):
         #print (self.trainDF['text'], self.trainDF['label'])
-        self.text_clf = Pipeline([('vect', CountVectorizer(stop_words='english')),
+        self.text_clf = Pipeline([('vect', TfidfVectorizer(stop_words='english')),
                                   ('tfidf', TfidfTransformer()),
-                                  ('clf', naive_bayes.MultinomialNB())])
+                                  ('clf', SGDClassifier(loss="modified_huber"))])
         try: 
             self.text_clf = self.text_clf.fit(
                 self.trainDF['text'], self.trainDF['label'])
@@ -52,13 +55,13 @@ class Keyword_Classifier:
             logging.error(traceback.format_exc())
             return
 
-        dump(self.text_clf, './model/' + domain + '/keyword_class.joblib')
+        dump(self.text_clf, model_folder + domain + '/keyword_class.joblib')
         #print (self.trainDF['label'])
         return
 
     def evaluate_model(self, domain):
         self.prepare_training_data(domain)
-        self.text_clf = load('./model/' + domain + '/keyword_class.joblib')
+        self.text_clf = load(model_folder + domain + '/keyword_class.joblib')
         predicted = None
         try:
             predicted = self.text_clf.predict(self.trainDF['text'])
@@ -82,7 +85,7 @@ class Keyword_Classifier:
         return
 
     def predict_text_data(self, text, domain):
-        self.text_clf = load('./model/' + domain + '/keyword_class.joblib')
+        self.text_clf = load(model_folder + domain + '/keyword_class.joblib')
         predictDF = pd.DataFrame()
         texts = []
         text = pre_process.preprocess_text(text)
@@ -115,7 +118,7 @@ class Keyword_Classifier:
                         insert_json = {"content": c_sentence, "type": "contract", "label": label, "eval_label": '',
                                        "score": p_score, "eval_score": 0, "domain": domain, "userid": "admin"}
                         batch_insert.append(insert_json)
-        self.dbutil.save_training_data_batch(batch_insert)
+            self.dbutil.save_training_data_batch(batch_insert)
         return
 
 ''' 
