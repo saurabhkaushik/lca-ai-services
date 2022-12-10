@@ -27,7 +27,7 @@ class DevelopmentConfig(Config):
     DB_NAME = 'lca_dev'
     DATA_ENV = 'local' 
     STORAGE_BUCKET = 'lca_dev'
-    APP_MODE= 'accuracy'
+    APP_MODE= 'learning'
 
 class TestingConfig(Config):
     DATABASE_URI = 'sqlite:///:memory:'
