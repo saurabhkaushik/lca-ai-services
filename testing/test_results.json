@@ -1,0 +1,169 @@
+{
+    "results": [
+        {
+            "text": "Twenty-five people have been arrested in raids across Germany on suspicion of plotting to overthrow the government. ",
+            "a_label": "NA",
+            "p_label": "non-current liabilities",
+            "p_score": 40,
+            "match": false
+        },
+        {
+            "text": "German reports say the group of far-right and ex-military figures planned to storm the parliament building, the Reichstag, and seize power.",
+            "a_label": "NA",
+            "p_label": "non-current liabilities",
+            "p_score": 43,
+            "match": false
+        },
+        {
+            "text": "A German man referred to as a prince called Heinrich XIII, 71, is alleged to have been central to their plans.",
+            "a_label": "NA",
+            "p_label": "non-current liabilities",
+            "p_score": 44,
+            "match": false
+        },
+        {
+            "text": "Among those arrested in 11 German states were two alleged ringleaders according to federal prosecutors.",
+            "a_label": "NA",
+            "p_label": "non-current liabilities",
+            "p_score": 39,
+            "match": false
+        },
+        {
+            "text": "We can see the company had $6 million in short-term debt for the period. ",
+            "a_label": "current liabilities",
+            "p_label": "non-current liabilities",
+            "p_score": 61,
+            "match": false
+        },
+        {
+            "text": "Accounts payable was broken up into two parts: merchandise payables totaling $1.674 billion, and other accounts payable and accrued liabilities totaling $2.739 billion. ",
+            "a_label": "current liabilities",
+            "p_label": "current liabilities",
+            "p_score": 63,
+            "match": true
+        },
+        {
+            "text": "Macy\u2019s had $20 million in taxes payable. ",
+            "a_label": "current liabilities",
+            "p_label": "current liabilities",
+            "p_score": 58,
+            "match": true
+        },
+        {
+            "text": "Total liabilities for August 2019 were $4.439 billion, which was nearly unchanged compared to the $4.481 billion for the same accounting period from one year earlier. ",
+            "a_label": "current liabilities",
+            "p_label": "non-current liabilities",
+            "p_score": 43,
+            "match": false
+        },
+        {
+            "text": "Counter guarantees and guarantees that are given by the company.",
+            "a_label": "contingent liabilities",
+            "p_label": "non-current liabilities",
+            "p_score": 64,
+            "match": false
+        },
+        {
+            "text": "The company gives a certain guarantee to another stakeholder on behalf of their third party. or it can also be said as the guarantee performed by certain companies as a result of the contract.",
+            "a_label": "contingent liabilities",
+            "p_label": "non-current liabilities",
+            "p_score": 70,
+            "match": false
+        },
+        {
+            "text": "Product warranty is also given by the company.",
+            "a_label": "contingent liabilities",
+            "p_label": "non-current liabilities",
+            "p_score": 60,
+            "match": false
+        },
+        {
+            "text": "The company also gives a guarantee on behalf of the stakeholders.",
+            "a_label": "contingent liabilities",
+            "p_label": "non-current liabilities",
+            "p_score": 61,
+            "match": false
+        },
+        {
+            "text": "The company also issues a letter of credit.",
+            "a_label": "contingent liabilities",
+            "p_label": "non-current liabilities",
+            "p_score": 56,
+            "match": false
+        },
+        {
+            "text": "The examples also include the adverse judgment of the potential disputes.",
+            "a_label": "contingent liabilities",
+            "p_label": "contingent liabilities",
+            "p_score": 53,
+            "match": true
+        },
+        {
+            "text": "Long-term financial liabilities will fall under this category.",
+            "a_label": "non-current liabilities",
+            "p_label": "non-current liabilities",
+            "p_score": 73,
+            "match": true
+        },
+        {
+            "text": "It may arise from bond payable or bank loans which may be recorded in the balance sheet in the form of amortized cost. ",
+            "a_label": "non-current liabilities",
+            "p_label": "non-current liabilities",
+            "p_score": 75,
+            "match": true
+        },
+        {
+            "text": "There is a past or current liability which puts a firm under obligation.",
+            "a_label": "non-current liabilities",
+            "p_label": "non-current liabilities",
+            "p_score": 61,
+            "match": true
+        },
+        {
+            "text": "Liabilities are in the form of borrowing. ",
+            "a_label": "non-current liabilities",
+            "p_label": "current liabilities",
+            "p_score": 43,
+            "match": false
+        },
+        {
+            "text": "When such an obligation is settled, it will lead to a decrease in a firm's assets.",
+            "a_label": "non-current liabilities",
+            "p_label": "non-current liabilities",
+            "p_score": 61,
+            "match": true
+        },
+        {
+            "text": "Deferred tax liability qualifies as a non-current liability. A firm may use a straight-line method of depreciation for financial reporting. ",
+            "a_label": "non-current liabilities",
+            "p_label": "non-current liabilities",
+            "p_score": 67,
+            "match": true
+        },
+        {
+            "text": "Such liability is created when gains or revenue are reflected on the income statement as it becomes eligible to be taxed.",
+            "a_label": "non-current liabilities",
+            "p_label": "non-current liabilities",
+            "p_score": 57,
+            "match": true
+        }
+    ],
+    "analysis": {
+        "current liabilities": {
+            "count": 4,
+            "match": 2
+        },
+        "contingent liabilities": {
+            "count": 6,
+            "match": 1
+        },
+        "non-current liabilities": {
+            "count": 7,
+            "match": 6
+        },
+        "NA": {
+            "count": 4,
+            "match": 0
+        }
+    }
+}

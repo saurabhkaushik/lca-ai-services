@@ -35,6 +35,7 @@ class Transformer_Classifier(object):
         self.dbutil = dbutil
         self.domains = domains
         self.mode = mode
+        print ('Transformer Mode: ', mode)
         self.risk_score = Risk_Score_Service(dbutil, domains)  
         pass
 

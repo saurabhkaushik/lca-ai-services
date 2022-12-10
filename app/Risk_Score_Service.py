@@ -7,8 +7,8 @@ from os.path import exists
 import logging
 
 sentiment_model = "distilbert-base-uncased-finetuned-sst-2-english"
-polarity_folder = './data/' 
-file_name = '_key_polarity.json'
+polarity_folder = './model/' 
+file_name = 'key_polarity.json'
 polarity_accuracy = 'high' # 'high'/'low'
 min_sentence_len = 10
 
@@ -27,8 +27,9 @@ class Risk_Score_Service(object):
     def load_polarity_data(self):
         for domain in self.domains:
             if not domain in self.domain_key_polarity.keys():
-                if exists(polarity_folder + domain + file_name ):
-                    with open(polarity_folder + domain + file_name) as json_file:
+                pol_file = polarity_folder + domain + '/' + file_name 
+                if exists(pol_file):
+                    with open(pol_file) as json_file:
                         self.domain_key_polarity[domain] = json.load(json_file)
                 else: 
                     logging.error('Polarity File is Missing.' + ' : ' + domain)
@@ -98,8 +99,8 @@ class Risk_Score_Service(object):
                 key_dic['polarity'] = int((key_dic['score']) / key_dic['count'])
         
         self.domain_key_polarity[domain]['keywords'] = key_polarity
-            
-        with open(polarity_folder + domain + file_name, "w") as outfile:
+        pol_file = polarity_folder + domain + '/' + file_name 
+        with open(pol_file, "w") as outfile:
             json.dump(self.domain_key_polarity[domain], outfile)
 
         print ('Polarity : \n', self.domain_key_polarity)

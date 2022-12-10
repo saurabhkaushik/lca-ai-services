@@ -1,5 +1,5 @@
 { 
-    "test_data": [{"data" : "Twenty-five people have been arrested in raids across Germany on suspicion of plotting to overthrow the government. ", "label" : "NA"},
+    "liabilities": [{"data" : "Twenty-five people have been arrested in raids across Germany on suspicion of plotting to overthrow the government. ", "label" : "NA"},
     {"data" : "German reports say the group of far-right and ex-military figures planned to storm the parliament building, the Reichstag, and seize power.", "label" : "NA"},
     {"data" : "A German man referred to as a prince called Heinrich XIII, 71, is alleged to have been central to their plans.", "label" : "NA"},
     {"data" : "Among those arrested in 11 German states were two alleged ringleaders according to federal prosecutors." , "label" : "NA"},
@@ -20,5 +20,6 @@
     {"data" : "When such an obligation is settled, it will lead to a decrease in a firm's assets.", "label" : "non-current liabilities"},
     {"data" : "Deferred tax liability qualifies as a non-current liability. A firm may use a straight-line method of depreciation for financial reporting. ", "label" : "non-current liabilities"},
     {"data" : "Such liability is created when gains or revenue are reflected on the income statement as it becomes eligible to be taxed." , "label" : "non-current liabilities"}
-]
+],
+    "esg" : []
 }

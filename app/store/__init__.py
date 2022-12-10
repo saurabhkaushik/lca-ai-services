@@ -4,12 +4,11 @@ import os
 from flask import Flask, render_template, request, url_for, flash, redirect
 from werkzeug.exceptions import abort
 from flask import make_response, jsonify
-from app.Transformer_Service import Transformer_Service
+from app.Transformer_Classifier import Transformer_Classifier
 from app.common.MySQLUtility import MySQLUtility
 from app.common.GCP_Storage import GCP_Storage
 from app.Data_ETL_Pipeline import Data_ETL_Pipeline
 from app.Risk_Score_Service import Risk_Score_Service
-from app.Model_Testing import Model_Testing
 
 def create_app(config, debug=False, testing=False, config_overrides=None):
     apps = Flask(__name__)
@@ -48,7 +47,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     logging.getLogger().setLevel(logging.INFO)
 
     dbutil = MySQLUtility(db_host, db_user, db_password, db_name)
-    model_service = Transformer_Service(dbutil, domains, mode)
+    class_service = Transformer_Classifier(dbutil, domains, mode)
     risk_scorer = Risk_Score_Service(dbutil, domains)
     gcp_store = GCP_Storage(domains, storage_bucket_env, mode)
 
@@ -56,7 +55,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     dbutil.get_connection()
 
     print ('Loading AI Models...')
-    model_service.preload_models()
+    class_service.preload_models()
 
     print ('Loading Keyword Polarity Data...')
     risk_scorer.load_polarity_data()
@@ -90,7 +89,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         contract = contract_data['content'] 
         #contract = preprocess.clean_input_text(contract)    
         print('Contract : \n', contract)
-        response = model_service.process_contract_request(contract, domain)
+        response = class_service.process_contract_request(contract, domain)
         dbutil.update_contracts_id(contract_id, contract_data['title'], contract, str(response))
         json_response = jsonify(response)
         print("Response : \n", response)
@@ -99,29 +98,21 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     @apps.route('/training_service', methods=('GET', 'POST'))
     def training_service():
         for domain in domains:
-            model_service.train_model(domain)
+            class_service = Transformer_Classifier(dbutil, domains, mode)
+            class_service.prepare_train_dataset(domain)
+            class_service.training(domain)
         return render_template('index.html')
-
-    @apps.route('/model_test_service', methods=('GET', 'POST'))
-    def model_test_service():
-        contract = "This is a very legalised way of doing businesss."
-        answer_results = {}
-        for domain in domains:
-            answer_results = model_service.predict_text(contract, domain)
-            print("Contract Analysis : ", answer_results)
-        return jsonify(answer_results)
     
     @apps.route('/etl_service', methods=('GET', 'POST'))
     def etl_service():
         data_etl = Data_ETL_Pipeline(dbutil, domains, mode)
         data_etl.start_process()
         return render_template('index.html')
-
-    @apps.route('/model_accuracy', methods=('GET', 'POST'))
-    def model_accuracy():
-        data_test = Model_Testing(dbutil, domains, mode)
-        results = data_test.start_testing()
-        return jsonify(results)
+    
+    @apps.route('/get_seed_service', methods=('GET', 'POST'))
+    def get_seed_service():
+        gcp_store.download_seed_data()
+        return render_template('index.html')
     
     @apps.route('/get_model_service', methods=('GET', 'POST'))
     def get_model_service():
@@ -132,7 +123,16 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     def put_model_service():
         gcp_store.upload_models()
         return render_template('index.html')
-    
+
+    @apps.route('/model_test_service', methods=('GET', 'POST'))
+    def model_test_service():
+        contract = "This is a very legalised way of doing businesss."
+        answer_results = {}
+        for domain in domains:
+            answer_results = class_service.process_contract_request(contract, domain)
+            print("Contract Analysis : ", answer_results)
+        return jsonify(answer_results)
+
     @apps.errorhandler(404)
     def not_found(error):
         return make_response(jsonify({'error': 'Not found'}), 404)

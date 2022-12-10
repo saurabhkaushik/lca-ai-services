@@ -1,4 +1,4 @@
-from app.Transformer_Service import Transformer_Service
+from app.Transformer_Classifier import Transformer_Classifier 
 
 from app.Data_Loader import Data_Loader
 from app.TextRank_Extractor import TextRank_Extractor
@@ -22,9 +22,8 @@ class Data_ETL_Pipeline(object):
         self.data_load = Data_Loader(self.dbutil)
         self.textrank = TextRank_Extractor(self.dbutil)
         self.key_classifier = Keyword_Classifier(self.dbutil)      
-        self.risk_class = Risk_Score_Service(self.dbutil, self.domains)    
-        self.model_service = Transformer_Service(dbutil, domains, mode)    
-        pass   
+        self.risk_class = Risk_Score_Service(self.dbutil, self.domains)        
+        pass    
 
     def create_dataset(self):
         print ('\n******* create_dataset\n')
@@ -56,17 +55,27 @@ class Data_ETL_Pipeline(object):
         print ('\n******* process_keyword_model\n')
         if self.mode == 'learning':
             for domain in self.domains:
-                print("model_service.train_model():" + domain)
-                self.model_service.train_model(domain)
+                seed_service = Transformer_Classifier(self.dbutil, self.domains, self.mode)
 
-                print("model_service.process_contract_data():" + domain)
-                self.model_service.process_contract_data(domain)
+                print("seed_service.prepare_train_dataset():" + domain)
+                seed_service.prepare_train_dataset(domain)
+
+                print("seed_service.training():" + domain)
+                seed_service.training(domain)
+
+                print("seed_service.process_contract_data():" + domain)
+                seed_service.process_contract_data(domain)
 
     def process_transformer_model(self):
         print ('\n******* process_transformer_model\n')
         for domain in self.domains:
-            print("model_service.train_model():" + domain)
-            self.model_service.train_model(domain)
+            class_service = Transformer_Classifier(self.dbutil, self.domains, self.mode)
+
+            print("class_service.prepare_train_dataset():" + domain)
+            class_service.prepare_train_dataset(domain)
+
+            print("class_service.training():" + domain)
+            class_service.training(domain)    
 
             print("risk_class.process_keyword_polarity():" , domain)
             self.risk_class.process_keyword_polarity(domain)
@@ -76,12 +85,18 @@ class Data_ETL_Pipeline(object):
         if self.mode == 'learning':
             for domain in self.domains:
                 print("class_service.process_contract_training_data_eval():" + domain)
-                self.model_service.process_contract_training_data_eval(domain)
+                self.class_service.process_contract_training_data_eval(domain)
+
+                print ("key_classifier.Keyword Classifier Accuracy: " + domain)
+                self.key_classifier.evaluate(domain) 
+                
+                print ("class_service.Transformer Classifier Accuracy: " + domain)
+                self.class_service.evalute(domain)
 
     def start_process(self):
-        #self.create_dataset()
-        #self.load_file_data()
-        #self.process_seed_training_data() 
+        self.create_dataset()
+        self.load_file_data()
+        self.process_seed_training_data() 
         self.process_keyword_model()
         self.process_transformer_model()
         #self.evaluate_results()
