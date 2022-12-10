@@ -2,7 +2,7 @@
 import json 
 from app.common.MySQLUtility import MySQLUtility
 from app.Transformer_Service import Transformer_Service
-testing_folder = '.testing/'
+testing_folder = './testing/'
 test_case_file = testing_folder + 'test_data.json'
 result_file = testing_folder + 'test_results.json'
 
@@ -19,7 +19,7 @@ class Model_Testing(object):
     def __init__(self, dbutil, domains, mode):
         self.dbutil = dbutil
         self.domains = domains
-        self.class_service = Transformer_Service(self.dbutil, domains, mode)
+        self.class_service = Transformer_Service(self.dbutil, domains)
         pass   
 
     def model_testing(self): 
@@ -46,13 +46,24 @@ class Model_Testing(object):
         analysis = {}
         for a_class in self.classes: 
             analysis[a_class] = {'count': 0, 'match': 0}
-
+        p_score = 0
+        n_score = 0
+        n_count = 0 
+        p_count = 0 
         for result in results: 
             for a_class in self.classes:                 
                 if a_class == result['a_label']:
                     analysis[a_class]['count'] += 1
-                    if result['match'] == True:
+                    if result['match']:
                         analysis[a_class]['match'] += 1
+            if result['match']: 
+                p_score += result['p_score']
+                p_count += 1
+            else: 
+                n_score += result['p_score']
+                n_count += 1
+        analysis['Positive Average'] = p_score / p_count 
+        analysis['Negative Average'] = n_score / n_count 
         return analysis
         
     def start_testing(self):
@@ -66,4 +77,4 @@ class Model_Testing(object):
 
         with open(result_file, "w") as outfile:
             outfile.write(json_object)
-        return json_object
+        return result_dict

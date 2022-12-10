@@ -21,22 +21,15 @@ presence_thresthold = 94
 model_folder_base = './model/'
 
 class Transformer_Service(object):
-    label_y = dict()
-    label_x = dict()
     risk_score = None
     model_dict = None
     dbutil = None 
     domains = None
-    train_hg = None
-    valid_hg = None
-    mode = None
     model_train = None
 
-    def __init__(self, dbutil, domains, mode):
+    def __init__(self, dbutil, domains):
         self.dbutil = dbutil
         self.domains = domains
-        self.mode = mode
-        print ('Transformer Mode: ', mode)
         self.risk_score = Risk_Score_Service(dbutil, domains)  
         self.model_train = Transformer_Trainer(self.dbutil)
         pass

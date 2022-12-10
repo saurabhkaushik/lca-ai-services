@@ -103,7 +103,7 @@ class Risk_Score_Service(object):
         with open(pol_file, "w") as outfile:
             json.dump(self.domain_key_polarity[domain], outfile)
 
-        print ('Polarity : \n', self.domain_key_polarity)
+        #print ('Polarity : \n', self.domain_key_polarity)
         return
 
     def get_keywords(self, domain):

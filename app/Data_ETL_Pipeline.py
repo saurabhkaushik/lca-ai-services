@@ -23,7 +23,7 @@ class Data_ETL_Pipeline(object):
         self.textrank = TextRank_Extractor(self.dbutil)
         self.key_classifier = Keyword_Classifier(self.dbutil)      
         self.risk_class = Risk_Score_Service(self.dbutil, self.domains)    
-        self.model_service = Transformer_Service(dbutil, domains, mode)    
+        self.model_service = Transformer_Service(dbutil, domains)    
         pass   
 
     def create_dataset(self):
@@ -79,9 +79,9 @@ class Data_ETL_Pipeline(object):
                 self.model_service.process_contract_training_data_eval(domain)
 
     def start_process(self):
-        #self.create_dataset()
-        #self.load_file_data()
-        #self.process_seed_training_data() 
+        self.create_dataset()
+        self.load_file_data()
+        self.process_seed_training_data() 
         self.process_keyword_model()
         self.process_transformer_model()
         #self.evaluate_results()

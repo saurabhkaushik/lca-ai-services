@@ -18,7 +18,6 @@ class Transformer_Trainer(object):
     dbutil = None 
     train_hg = None
     valid_hg = None
-    mode = None
     model = None
     trainer = None
 

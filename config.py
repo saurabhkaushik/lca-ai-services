@@ -14,7 +14,7 @@ class ProductionConfig(Config):
     DB_NAME = 'lca_prod'
     DATA_ENV = 'local'
     STORAGE_BUCKET = 'lca_prod'
-    APP_MODE= 'accuracy'
+    APP_MODE= 'learning'
 
 class DevelopmentConfig(Config):
     FLASK_APP='src/app'

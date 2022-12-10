@@ -48,7 +48,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     logging.getLogger().setLevel(logging.INFO)
 
     dbutil = MySQLUtility(db_host, db_user, db_password, db_name)
-    model_service = Transformer_Service(dbutil, domains, mode)
+    model_service = Transformer_Service(dbutil, domains)
     risk_scorer = Risk_Score_Service(dbutil, domains)
     gcp_store = GCP_Storage(domains, storage_bucket_env, mode)
 

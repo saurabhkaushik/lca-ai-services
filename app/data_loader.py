@@ -5,7 +5,7 @@ import os
 from app.PreProcessText import PreProcessText
 from app.TextRank_Extractor import TextRank_Extractor
 
-data_folder = './data-s/'
+data_folder = './data/'
 min_sentence_len = 10
 
 class Data_Loader(object):
