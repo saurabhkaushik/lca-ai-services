@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "lca-prod",
+  "private_key_id": "11b348998d988889f2ac1439980bc243fa7b24a3",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDIUA48UNzsgBlW\nCQUG4VhnEYITco/Zabp3D5u3/SaVH7qaC6Q5HvTeDBLOYrA7iJMlU2kwWVZOXj0u\njzxnIEduRX4eUlXRVxpeItaq6hJK42lj1fpSMVuzOj08hwX8KcC8AyX/kCKpapET\n/0fjm/j8Vhh6p87SgLRqIg/XfahDhgsS7lDu5mAi0glXJ3aiR++cbBNvolA4JK5d\nMU1P6axQd3J27F9cEWGycQbFjSH3hSDjTKFudXI7stlnuCd3q+ziZFw8n2O5kTB0\nWKko9y/4VkdOKCiN29oU32mjejgki3EV+xGepkw8UKcVpT0EPyg61HOzM11zf6DS\nxex8vSXrAgMBAAECggEAU0Nfn3e3VUEsBuSp58G8tt8CtCW/II6/uOTOhAygwITX\nUlf7c9jnzPK00IAaJCzxiSbiRvwjkWC/yr40S+ORfYc6VM1BqcoshiuyEopIf0OH\nF74mloq4xMe1E5dGiBos6JngbhoSJlzLIEZRMg2v0efRtg5RvJNOKv2smxS64BG3\n/UvQjcKROnqNFDC+qJUiTbiaI32E9EKPs/1hfau7+iuArLWNYqy/XXteaFGS11nX\nLdu9+NqUIo8Ezv8p5FuNFGPdhoLm+KBnWoh0io+iT5LBr3TajzDWxyesvN63BE4a\nq6h4ZKHFWPHV3oKCbP9WtDrcT+2aO3xeO9TJV4ytqQKBgQDklxMGxYd/bxUui+U4\nzyBNWNah6vDtXC+NqZFLR6NosGR767J8txja7PSEU+zdpzCsv8l52Xghbp/grSyK\n+3szTbnmh+nTkTH4ARtW2GGFXp+5rcdsmflT0ecL3ASMBUpyMdwj4kQ2op8Atb7G\ngVkrTXKql9FFR2cacwCd/k7KwwKBgQDgVPZl4iCphR1Mxx274i7pyNN482lzCyy8\nw6WYSr/vmpJzNBOyr+1NBHOdrQNk5ANxX77xUM5WhwsElo2wa+tSITRz0D/DB8hp\nKY0pUEven2XdT1ki33SwCIEpNaKyTPsKnKbtf/5ljATbQWDoRZUX0nLGlfMuBm9G\ncjyKH0D1uQKBgHI4VuZ8Tw9LBy+B8aCoRoC/kkfH6GkCNjS39QTDoBBQi3UsObx9\nlOrXmfqBIQtEXlsDXf4HvzIdX7/ZaDduH4psHSbm5Ny1YV2F2A5WAqyssm0KO2q1\nqVLLwII5hwAcKK3U4iYACouuSHsHVXNE8LRld5VsVMIkQo2Bx14q014XAoGBALW3\nPQyUmr6WzIAn/sb11eicO+kKy41cLPYPSXFOg6F0RVM6iQZCiefMRlcgEdLE/KD2\n3PYe7bWbmGo0Bjw1fx49NX7m3u99u3KsLOOdXofL+LjHkL214pDBotad0te5kdUr\nxfA2sPzS6hAtKnGcA8STPVPtnVnX7oVS/gUogfdJAoGACRDovWjJDcYMjmSAyO60\nibvCLCCiiY+tJ7l5cIYi/SZ08ato/y+iHNqlDNcQj8rG8wnv8Cg0+QpVtfEtKGuF\nZ2pa5kiagnsIxUfCYKuJ4jdnlpr2L0Cmn7mi+Kvxwf2YYpMIEhK+nV3E+hTj4Yua\nda5r1roFINbwcMO5dCv0dZ8=\n-----END PRIVATE KEY-----\n",
+  "client_email": "lca-prod@lca-prod.iam.gserviceaccount.com",
+  "client_id": "106238052805469331595",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/lca-prod%40lca-prod.iam.gserviceaccount.com"
+}

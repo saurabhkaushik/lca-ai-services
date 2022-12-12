@@ -19,9 +19,11 @@ class GCP_Storage(object):
 
     def setup_bucket(self):
         storage_client = storage.Client()
-        if not storage_client.bucket(self.project_bucket).exists():
+        project_bucket = storage_client.bucket(self.project_bucket)
+        '''if not project_bucket.exists():
             bucket = storage_client.create_bucket(self.project_bucket)
             print(f"Bucket {bucket.name} created.")
+        '''
         return None
     
     def upload_blob(self, bucket_name, source_file_name, destination_blob_name):

@@ -107,7 +107,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         contract = "This is a very legalised way of doing businesss."
         answer_results = {}
         for domain in domains:
-            answer_results = model_service.predict_text(contract, domain)
+            answer_results = model_service.process_contract_request(contract, domain)
             print("Contract Analysis : ", answer_results)
         return jsonify(answer_results)
     

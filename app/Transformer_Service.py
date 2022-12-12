@@ -17,7 +17,7 @@ from app.Transformer_Trainer import Transformer_Trainer
 model_checkpoint = "distilbert-base-uncased"
 min_sentence_len = 10
 processTxt = PreProcessText()
-presence_thresthold = 94
+presence_thresthold = 99
 model_folder_base = './model/'
 
 class Transformer_Service(object):

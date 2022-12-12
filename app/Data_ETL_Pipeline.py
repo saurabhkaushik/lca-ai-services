@@ -57,7 +57,7 @@ class Data_ETL_Pipeline(object):
         if self.mode == 'learning':
             for domain in self.domains:
                 print("model_service.train_model():" + domain)
-                self.model_service.train_model(domain)
+                #self.model_service.train_model(domain)
 
                 print("model_service.process_contract_data():" + domain)
                 self.model_service.process_contract_data(domain)
