@@ -8,7 +8,7 @@ class ProductionConfig(Config):
     FLASK_ENV='production'
     DOMAINS =['liabilities', 'esg']
     DEFAULT_DOMAIN = 'esg'
-    DB_HOST = '34.93.121.15'
+    DB_HOST = '35.223.87.190'
     DB_USER = 'root'
     DB_PASSWORD = 'Nu123456$$'
     DB_NAME = 'lca_prod'
@@ -21,7 +21,7 @@ class DevelopmentConfig(Config):
     FLASK_ENV='development'   
     DOMAINS =['liabilities', 'esg']
     DEFAULT_DOMAIN = 'esg'
-    DB_HOST = '34.93.121.15'
+    DB_HOST = '35.223.87.190'
     DB_USER = 'root'
     DB_PASSWORD = 'Nu123456$$'
     DB_NAME = 'lca_dev'

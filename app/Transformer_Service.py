@@ -63,6 +63,17 @@ class Transformer_Service(object):
             return None
         return model
 
+    def process_text(self, c_sentence, domain):
+        model = self.load_model(domain)
+        resp = {}
+        if len(c_sentence) > min_sentence_len and len(c_sentence) < 512:
+                results = self.model_train.predict_model(c_sentence, model)
+                if results:
+                    resp['label'] = results[0]["label"]
+                    resp['score'] = int (results[0]["score"] * 100)
+                    return resp
+        return None
+
     def process_contract_request(self, article_text, domain):
         model = self.load_model(domain)
         if model == None:

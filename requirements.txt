@@ -11,3 +11,5 @@ scikit-learn
 mysql-connector-python
 waitress
 google-cloud-storage
+parsedatetime
+word2number
