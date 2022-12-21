@@ -40,23 +40,26 @@ class Transformer_Service(object):
         trainer.train(model_folder)
         return
 
+    def preload_models(self):
+        model_dict = {}
+        for domain in self.domains:
+            model_folder = model_folder_base + domain + '/'
+            path_to_file = model_folder + 'config.json'
+            if exists(path_to_file):
+                try:
+                    model_dict[domain] = AutoModelForSequenceClassification.from_pretrained(model_folder)
+                except Exception as e: 
+                    logging.exception('Could not load AI Models')
+        return 
+
     def load_model(self, domain):
+        if not model_dict:
+            self.preload_models()
         model = None
-        if model_dict:
-            if domain in model_dict.keys():
-                model = model_dict[domain]
-        else:
-            model_dict = {}
-            for domain in self.domains:
-                model_folder = model_folder_base + domain + '/'
-                path_to_file = model_folder + 'config.json'
-                if exists(path_to_file):
-                    try:
-                        model_dict[domain] = AutoModelForSequenceClassification.from_pretrained(model_folder)
-                    except Exception as e: 
-                        logging.exception('Could not load AI Models')
-                if domain in model_dict.keys():
-                    model = model_dict[domain]
+        try:
+            model = model_dict[domain]
+        except Exception as e:
+            return None
         return model
 
     def process_text(self, c_sentence, domain):
