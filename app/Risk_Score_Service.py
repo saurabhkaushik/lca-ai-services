@@ -11,10 +11,10 @@ polarity_folder = './model/'
 file_name = 'key_polarity.json'
 polarity_accuracy = 'high' # 'high'/'low'
 min_sentence_len = 10
-
-class Risk_Score_Service(object):
-    sentiment_pipeline = pipeline(
+sentiment_pipeline = pipeline(
         "sentiment-analysis", model=sentiment_model)
+        
+class Risk_Score_Service(object):
     domain_key_polarity = {}
     dbutil = None 
     domains = None
@@ -37,7 +37,7 @@ class Risk_Score_Service(object):
 
     def get_sentiment_score(self, sentence):
         data = [sentence]
-        sent_result = self.sentiment_pipeline(data)
+        sent_result = sentiment_pipeline(data)
         #print (sent_result)
         sent_score = (
             sent_result[0]['score']) if sent_result[0]['label'] == 'POSITIVE' else -(sent_result[0]['score'])

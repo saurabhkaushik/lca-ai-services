@@ -8,13 +8,12 @@ from sklearn.model_selection import train_test_split
 from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
                           Trainer, TrainingArguments, pipeline)
 
-
 model_checkpoint = "distilbert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
 
 class Transformer_Trainer(object):
     label_y = dict()
     label_x = dict()
-    tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
     dbutil = None 
     train_hg = None
     valid_hg = None
@@ -29,7 +28,7 @@ class Transformer_Trainer(object):
         text = row['content']
         text = str(text)
         text = ' '.join(text.split())
-        encodings = self.tokenizer(text, padding="max_length",
+        encodings = tokenizer(text, padding="max_length",
                               truncation=True, max_length=128)
 
         label = self.label_y[row['label'].lower().strip()]
@@ -94,7 +93,7 @@ class Transformer_Trainer(object):
             args=training_args,
             train_dataset=self.train_hg,
             eval_dataset=self.valid_hg,
-            tokenizer=self.tokenizer
+            tokenizer=tokenizer
         )
         self.trainer.train()   
         self.model.save_pretrained(model_folder)     
@@ -105,7 +104,7 @@ class Transformer_Trainer(object):
         classifier = None
         try: 
             classifier = pipeline("text-classification",
-                                model=model, tokenizer=self.tokenizer)
+                                model=model, tokenizer=tokenizer)
         except Exception as e:
             logging.exception('Model missing :')
             return None
@@ -117,7 +116,7 @@ class Transformer_Trainer(object):
         classifier = None
         try: 
             classifier = pipeline("text-classification",
-                                model=model, tokenizer=self.tokenizer)
+                                model=model, tokenizer=tokenizer)
         except Exception as e:
             logging.exception('Model missing :')
             return None

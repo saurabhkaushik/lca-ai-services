@@ -14,15 +14,14 @@ from app.PreProcessText import PreProcessText
 from app.Risk_Score_Service import Risk_Score_Service
 from app.Transformer_Trainer import Transformer_Trainer
 
-model_checkpoint = "distilbert-base-uncased"
 min_sentence_len = 10
 processTxt = PreProcessText()
 presence_thresthold = 99
 model_folder_base = './model/'
+model_dict = None
 
 class Transformer_Service(object):
     risk_score = None
-    model_dict = None
     dbutil = None 
     domains = None
     model_train = None
@@ -41,26 +40,23 @@ class Transformer_Service(object):
         trainer.train(model_folder)
         return
 
-    def preload_models(self):
-        self.model_dict = {}
-        for domain in self.domains:
-            model_folder = model_folder_base + domain + '/'
-            path_to_file = model_folder + 'config.json'
-            if exists(path_to_file):
-                try:
-                    self.model_dict[domain] = AutoModelForSequenceClassification.from_pretrained(model_folder)
-                except Exception as e: 
-                    logging.exception('Could not load AI Models')
-        return 
-
     def load_model(self, domain):
-        if not self.model_dict:
-            self.preload_models()
         model = None
-        try:
-            model = self.model_dict[domain]
-        except Exception as e:
-            return None
+        if model_dict:
+            if domain in model_dict.keys():
+                model = model_dict[domain]
+        else:
+            model_dict = {}
+            for domain in self.domains:
+                model_folder = model_folder_base + domain + '/'
+                path_to_file = model_folder + 'config.json'
+                if exists(path_to_file):
+                    try:
+                        model_dict[domain] = AutoModelForSequenceClassification.from_pretrained(model_folder)
+                    except Exception as e: 
+                        logging.exception('Could not load AI Models')
+                if domain in model_dict.keys():
+                    model = model_dict[domain]
         return model
 
     def process_text(self, c_sentence, domain):

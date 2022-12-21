@@ -137,6 +137,12 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         data_etl = Data_ETL_Pipeline(dbutil, domains, mode)
         data_etl.start_process()
         return render_template('index.html')
+    
+    @apps.route('/db_service', methods=('GET', 'POST'))
+    def db_service():
+        data_etl = Data_ETL_Pipeline(dbutil, domains, mode)
+        data_etl.create_dataset()
+        return render_template('index.html')
 
     @apps.route('/model_accuracy', methods=('GET', 'POST'))
     def model_accuracy():
