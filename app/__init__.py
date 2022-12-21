@@ -145,12 +145,12 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         return jsonify(results)
     
     @apps.route('/get_model_service', methods=('GET', 'POST'))
-    def get_trans_service():
+    def get_model_service():
         gcp_service.download_models()
         return render_template('index.html')
     
     @apps.route('/put_model_service', methods=('GET', 'POST'))
-    def put_trans_service():
+    def put_model_service():
         gcp_service.upload_models()
         return render_template('index.html')
     
