@@ -108,10 +108,7 @@ class PreProcessText(object):
             sent_list.append(json_sent)
             start = end 
         return sent_list
-    
-    def get_sentences_regex(self, article_text):
-        sentences = re.split(r' *[\.\?!][\'"\)\]]* *', article_text)
-        return sentences
+
 
     def get_sentences_spacy(self, article_text):
         about_doc = self.nlp(article_text)
@@ -125,6 +122,10 @@ class PreProcessText(object):
 
 
 ''' 
+    def get_sentences_regex(self, article_text):
+        sentences = re.split(r' *[\.\?!][\'"\)\]]* *', article_text)
+        return sentences
+
     def search_sentence(self, sentence, article_text):
         start_i = 0
         end_i = 0

@@ -24,9 +24,9 @@ class DevelopmentConfig(Config):
     DB_HOST = '35.223.87.190'
     DB_USER = 'root'
     DB_PASSWORD = 'Nu123456$$'
-    DB_NAME = 'lca_dev'
+    DB_NAME = 'lca_prod'
     DATA_ENV = 'local' 
-    STORAGE_BUCKET = 'lca_dev'
+    STORAGE_BUCKET = 'lca_prod'
     APP_MODE= 'accuracy'
 
 class TestingConfig(Config):

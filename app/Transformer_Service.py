@@ -18,13 +18,13 @@ min_sentence_len = 10
 processTxt = PreProcessText()
 presence_thresthold = 99
 model_folder_base = './model/'
-model_dict = None
 
 class Transformer_Service(object):
     risk_score = None
     dbutil = None 
     domains = None
     model_train = None
+    model_dict = None
 
     def __init__(self, dbutil, domains):
         self.dbutil = dbutil
@@ -41,23 +41,23 @@ class Transformer_Service(object):
         return
 
     def preload_models(self):
-        model_dict = {}
+        self.model_dict = {}
         for domain in self.domains:
             model_folder = model_folder_base + domain + '/'
             path_to_file = model_folder + 'config.json'
             if exists(path_to_file):
                 try:
-                    model_dict[domain] = AutoModelForSequenceClassification.from_pretrained(model_folder)
+                    self.model_dict[domain] = AutoModelForSequenceClassification.from_pretrained(model_folder)
                 except Exception as e: 
                     logging.exception('Could not load AI Models')
         return 
 
     def load_model(self, domain):
-        if not model_dict:
+        if not self.model_dict:
             self.preload_models()
         model = None
         try:
-            model = model_dict[domain]
+            model = self.model_dict[domain]
         except Exception as e:
             return None
         return model

@@ -52,7 +52,7 @@ class Risk_Score_Service(object):
         key_polarity = self.domain_key_polarity[domain]['keywords']   
         for key_dic in key_polarity:            
             if key_dic['name'] in text_lem:  
-                #print('Polarity Word Found : \'' + key_dic['name'] + '\'')
+                #print('Polarity Word Found : \'' + key_dic['name'] + '\'' + ' Score: ' + str(key_dic['polarity']))
                 pol_score = key_dic['polarity']
                 if sem_score >= 0:
                     context_score += pol_score
@@ -68,7 +68,6 @@ class Risk_Score_Service(object):
             context_score = self.get_sentiment_score(text)
         
         context_score = int (50 + (context_score / 2))
-        #print ('Test 3')
         return context_score
 
     def process_keyword_polarity(self, domain):         
