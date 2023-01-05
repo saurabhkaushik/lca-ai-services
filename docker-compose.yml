@@ -13,9 +13,9 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - legal-net
+      - legal-net 
 
-networks:
+networks:  
   legal-net:
     name: law-network 
     external: true
