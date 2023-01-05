@@ -1,0 +1,15 @@
+Flask
+torch
+transformers
+evaluate
+gensim
+spacy
+scipy 
+PyTextRank
+datasets
+scikit-learn
+mysql-connector-python
+waitress
+google-cloud-storage
+parsedatetime
+word2number

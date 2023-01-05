@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>{% block title %} LCA AI Service {% endblock %}</h1>
+    <p>Legal Contract Application helps you reduce the Financial/Legal/Compliance Risk from their regular contract/legal document processing, 
+    <br>so that, Businesses/Users can focus their energy on mitigating those risks and profiting from them. </p>
+    <li>Sentence Identification Service </li>
+    <li>Risk Index Score (RIS) Service</li>
+    <li>Liability Analysis Service </li>
+    <li>Domain Improvement Service </li>
+    <br><br>
+    <h3>Here are Admin Service for LCA Tool. </h3>
+    <li>
+        <a href="{{ url_for('model_test_service') }}">
+            Model Service - Testing 
+        </a></li>
+    <li>
+        <a href="{{ url_for('training_service') }}">
+            Model Service - Training    
+        </a></li>    
+    <li>
+        <a href="{{ url_for('etl_service') }}"> 
+            ETL Service : Run
+        </a></li>
+    <li>
+        <a href="{{ url_for('db_service') }}"> 
+            DB Create Service : Run
+            </a></li>   
+    <li>
+        <a href="{{ url_for('model_accuracy') }}"> 
+            Module Accuracy Service : Run
+        </a></li>
+    <li>
+        <a href="{{ url_for('get_model_service') }}">
+            Model Files Service - Download 
+        </a></li>
+    <li>
+        <a href="{{ url_for('put_model_service') }}">
+            Model Files Service - Upload 
+        </a></li>
+{% endblock %}

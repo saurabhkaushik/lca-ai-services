@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  law-service:
+    image: "law-service-app:latest"
+    container_name: "law-service-app"
+    build: .
+    environment:
+      DEBUG: "True"
+      PYTHONUNBUFFERED: '1'
+      REQUIREMENTS: requirements.txt
+    expose: 
+    - 8080
+    ports:
+      - "8080:8080"
+    networks:
+      - legal-net
+
+networks:
+  legal-net:
+    name: law-network 
+    external: true
