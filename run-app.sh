@@ -3,7 +3,7 @@
 export LCA_APP_ENV='development'  
 #export LCA_APP_ENV='production'  
 export GOOGLE_APPLICATION_CREDENTIALS='./config/gcp/lca-prod-key.json'
-export PORT=8081
+export PORT=8080
 source env/bin/activate
 #python3 -m pip install --upgrade pip
 #pip3 install -r requirements.txt --upgrade

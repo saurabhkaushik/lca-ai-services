@@ -13,3 +13,4 @@ waitress
 google-cloud-storage
 parsedatetime
 word2number
+flask_cors
