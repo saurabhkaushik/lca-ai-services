@@ -8,7 +8,7 @@ from flask import (Flask, flash, jsonify, session, make_response, redirect,
 from flask_cors import CORS
 from app.Transformer_Service import Transformer_Service
 from app.Risk_Score_Service import Risk_Score_Service
-from app.Sentence_Analytics import Sentence_Analytics
+from app.Numerical_Analytics import Numerical_Analytics
 from app.Data_ETL_Pipeline import Data_ETL_Pipeline
 from app.Model_Testing import Model_Testing
 
@@ -52,7 +52,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     highservice = Highlight_Service()
     trans_service = Transformer_Service(dbutil, domains)
     risk_service = Risk_Score_Service(dbutil, domains)
-    sent_service = Sentence_Analytics(trans_service, risk_service)
+    num_service = Numerical_Analytics(trans_service, risk_service)
 
     print ('Creating DB Connection Pool')
     dbutil.get_connection()
@@ -69,8 +69,8 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     def index():
         return render_template('index.html')
 
-    @apps.route('/contract_new_api', methods=('GET', 'POST'))
-    def contract_new_api():
+    @apps.route('/report_new_api', methods=('GET', 'POST'))
+    def report_new_api():
         post = {}
         if request.method == 'POST':
             req_json = request.get_json()
@@ -85,7 +85,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
             else:
                 batch_insert = []
                 insert_json = {"title": title, "content": content,  "type": "users",
-                               "response": '', "domain": domain, "userid": "user"}
+                               "response": '', "score": 0, "report": 'false', "domain": domain, "userid": "user"}
                 batch_insert.append(insert_json)
                 id = dbutil.save_contracts_batch(batch_insert)
 
@@ -112,8 +112,8 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         json_resp.mimetype = 'application/json'
         return json_resp
 
-    @apps.route('/text_analysis_api', methods=('GET', 'POST'))
-    def text_analysis_api():
+    @apps.route('/company_new_api', methods=('GET', 'POST'))
+    def company_new_api():
         post = {}
         if request.method == 'POST':
             req_json = request.get_json()
@@ -121,17 +121,96 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
             title = req_json['title']
             content = req_json['content']
             domain = req_json['domain']
+            threshold = req_json['threshold']
+            report = 'true'
+            score = 0
+            print("Contract : ", content)
+            if not content or not title:
+                flash('contract and title is required!')
+            else:
+                answer = trans_service.process_contract_request(content, domain)
+
+                if answer == None:
+                    answer = ''
+                response, report_analysis = highservice.highlight_text(answer, threshold)
+
+                if (report_analysis['score_report_json'] != None):    
+                    score = report_analysis['score_report_json']['score_report_risk_score']
+
+                batch_insert = []
+                insert_json = {"title": title, "content": content,  "type": "users",
+                               "response": str(answer), "score": score, "report": report, "domain": domain, "userid": "user"}
+                batch_insert.append(insert_json)
+                id = dbutil.save_contracts_batch(batch_insert)
+
+                post = dbutil.get_contracts_id(id)
+
+                for pst in post:
+                    post = pst
+                post['highlight_response'] = response
+                post['score_report_json'] = report_analysis['score_report_json']
+                post['score_context_count_json'] = report_analysis['score_context_count_json']
+                post['score_presence_count_json'] = report_analysis['score_presence_count_json']
+                post['score_presence_data'] = report_analysis['score_presence_data']
+                post['class_analysis_data'] = report_analysis['class_analysis_data']
+                #post['class_analysis_key'] = list(report_analysis['class_analysis_data'].keys())
+                #post['class_analysis_value'] = list(report_analysis['class_analysis_data'].values())
+        print (post)
+        json_resp = jsonify(post)
+        json_resp.mimetype = 'application/json'
+        return json_resp
+
+    @apps.route('/risk_analysis_api', methods=('GET', 'POST'))
+    def risk_analysis_api():
+        post = {}
+        if request.method == 'POST':
+            req_json = request.get_json()
+            print (req_json)
+            title = req_json['title']
+            content = req_json['content']
+            domain = req_json['domain']
+            post = {}
             print("Contract : ", content)
             if not content or not title:
                 flash('contract and title is required!')
             else:
                 batch_insert = []
                 insert_json = {"title": title, "content": content,  "type": "users",
-                               "response": '', "domain": domain, "userid": "user"}
+                               "response": '', "score": 0, "report": 'false', "domain": domain, "userid": "user"}
                 batch_insert.append(insert_json)
                 id = dbutil.save_contracts_batch(batch_insert)
 
-                response = sent_service.process_request(content, domain)
+                answer = trans_service.process_contract_request(content, domain)
+
+                if answer != None:
+                    post['results'] = answer                
+
+        print (post)
+        json_resp = jsonify(post)
+        json_resp.mimetype = 'application/json'
+        return json_resp
+
+    @apps.route('/num_analysis_api', methods=('GET', 'POST'))
+    def num_analysis_api():
+        post = {}
+        if request.method == 'POST':
+            req_json = request.get_json()
+            print (req_json)
+            title = req_json['title']
+            content = req_json['content']
+            domain = req_json['domain']
+            threshold = req_json['threshold']
+            print("Contract : ", content)
+            if not content or not title:
+                flash('contract and title is required!')
+            else:
+                batch_insert = []
+                insert_json = {"title": title, "content": content,  "type": "users",
+                               "response": '', "score": 0, "report": 'false', "domain": domain, "userid": "user"}
+                batch_insert.append(insert_json)
+                id = dbutil.save_contracts_batch(batch_insert)
+
+                response = num_service.process_request(content, domain, threshold)
 
                 if not response:
                     response = ''
@@ -167,7 +246,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
                 flash('contract and title is required!')
             else:
                 batch_insert = []
-                insert_json = {"content": content, "label" : label, "type": "users", "eval_label" : "", "eval_score" : 0,
+                insert_json = {"content": content, "label" : label, "type": "users", 
                                "score": 0, "domain": domain, "userid": "user"}
                 batch_insert.append(insert_json)
                 dbutil.save_training_data_batch(batch_insert)
@@ -195,7 +274,8 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         req_json = request.get_json()
         print (req_json)
         domain = req_json['domain']
-        posts = dbutil.get_contracts(domain)
+        report = req_json['report']
+        posts = dbutil.get_contracts(domain, report)
         json_resp = jsonify(posts)
         json_resp.mimetype = 'application/json'
         return json_resp

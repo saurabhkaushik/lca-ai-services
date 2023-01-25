@@ -16,7 +16,7 @@ class Highlight_Service:
                     flag = "HIGH"
         return flag
 
-    def highlight_text(self, hl_index, present_base_score):
+    def highlight_text(self, trans_resp, threshold):
         processed_text = ""
 
         score_presence_count_total = 0
@@ -27,17 +27,17 @@ class Highlight_Service:
         class_analysis = {}
         highlight_results = []
         score_presence_count_json = {}
-        for key in hl_index:
+        for key in trans_resp:
             highlight_dict = {}
-            highlight_dict['c_sentence'] = hl_index[key]['sentence']
-            highlight_dict['label'] = hl_index[key]['label'].capitalize()  
-            label = hl_index[key]['label']  
+            highlight_dict['c_sentence'] = trans_resp[key]['sentence']
+            highlight_dict['label'] = trans_resp[key]['label'].capitalize()  
+            label = trans_resp[key]['label']  
 
-            highlight_dict['p_score'] = int(hl_index[key]['presence_score'])
-            highlight_dict['c_score'] = int(hl_index[key]['context_score'])
-            highlight_dict['risk_score'] = int(hl_index[key]['risk_score'])               
+            highlight_dict['p_score'] = int(trans_resp[key]['presence_score'])
+            highlight_dict['c_score'] = int(trans_resp[key]['context_score'])
+            highlight_dict['risk_score'] = int(trans_resp[key]['risk_score'])               
                       
-            if highlight_dict['p_score'] >= present_base_score:
+            if highlight_dict['p_score'] >= threshold:
                 score_risk_sents += highlight_dict['risk_score']
                 score_presence_count_total += 1
                 if label in score_presence_count_json.keys(): 

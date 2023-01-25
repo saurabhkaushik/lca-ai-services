@@ -4,7 +4,7 @@ gcloud config set project 'lca-prod-372208'
 
 # Docker Build - Local 
 docker build -t law-service-app . 
-#docker run -p 8080:8080 -it law-service-app 
+#docker run -p 8081:8080 -it law-service-app 
 
 # Repo in Artifactory 
 #gcloud artifacts repositories create lca-service-app --repository-format=docker --location=asia-south1 

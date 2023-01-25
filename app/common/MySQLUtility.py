@@ -20,6 +20,8 @@ schema_contract_data = "CREATE TABLE IF NOT EXISTS contract_data (" + \
     "content LONGTEXT, " + \
     "type VARCHAR(255), " + \
     "response LONGTEXT, " + \
+    "score INTEGER, " + \
+    "report VARCHAR(255), " + \
     "domain VARCHAR(255), " + \
     "userid VARCHAR(255));"
 
@@ -39,9 +41,7 @@ schema_training_data = "CREATE TABLE IF NOT EXISTS training_data (" + \
     "content LONGTEXT, " + \
     "type VARCHAR(255), " + \
     "label VARCHAR(255), " + \
-    "eval_label VARCHAR(255), " + \
     "score INTEGER, " + \
-    "eval_score INTEGER, " + \
     "domain VARCHAR(255), " + \
     "userid VARCHAR(255));"
 
@@ -141,11 +141,11 @@ class MySQLUtility(object):
         return
 
     # Contracts CRUD
-    def get_contracts(self, domain, page="true"):
+    def get_contracts(self, domain, report="false"):
         cnxn = self.get_connection()
         cursor = cnxn.cursor(dictionary=True)
 
-        uuid_query = "Select * from contract_data" + " where domain=\'" + domain + '\';'
+        uuid_query = "Select * from contract_data" + " where domain=\'" + domain + "\' and report=\'" + report + "\';"
         cursor.execute(uuid_query)
         if cursor.rowcount > 0:
             print(cursor.statement)
@@ -175,8 +175,8 @@ class MySQLUtility(object):
         cursor = cnxn.cursor()
         uu_id = ''
         rows_to_insert = []
-        insert_stmt = ("INSERT INTO contract_data (id, created, title, content, type, response, domain, userid) "
-                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
+        insert_stmt = ("INSERT INTO contract_data (id, created, title, content, type, response, score, report, domain, userid) "
+                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
         for row in batch_data:
             uu_id = str(uuid.uuid4())
             title = row['title']
@@ -184,7 +184,7 @@ class MySQLUtility(object):
             now = datetime.datetime.utcnow()
             formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
             insert_str = (uu_id, formatted_date, title, content,
-                          row['type'], row['response'], row['domain'], row['userid'])
+                          row['type'], row['response'], row['score'], row['report'], row['domain'], row['userid'])
             rows_to_insert.append(insert_str)
 
         cursor.executemany(insert_stmt, rows_to_insert)
@@ -196,13 +196,13 @@ class MySQLUtility(object):
         print(cursor.rowcount, "record(s) affected")
         return uu_id
 
-    def update_contracts_id(self, id, title, content, response):
+    def update_contracts_id(self, id, title, content, response, score, report):
         cnxn = self.get_connection()
         cursor = cnxn.cursor()
 
         uuid_query = "UPDATE " + self.table_id1 + \
-            " SET response = %s, title = %s, content = %s where id = %s;"
-        val = (response, title, content, id)
+            " SET title = %s, content = %s, response = %s, score =%s, report=%s where id = %s;"
+        val = (title, content, response, score, report, id)
 
         cursor.execute(uuid_query, val)
         if cursor.rowcount > 0:
@@ -364,14 +364,14 @@ class MySQLUtility(object):
         cursor = cnxn.cursor()
 
         rows_to_insert = []
-        insert_stmt = ("INSERT INTO " + self.table_id3 + " (id, created, content, type, label, eval_label, score, eval_score, domain, userid) "
-                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+        insert_stmt = ("INSERT INTO " + self.table_id3 + " (id, created, content, type, label, score, domain, userid) "
+                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
         for row in batch_data:
             uu_id = str(uuid.uuid4())
             now = datetime.datetime.utcnow()
             formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
-            insert_set = (uu_id, formatted_date, row['content'], row['type'], row['label'], row['eval_label'], int(
-                row['score']), int(row['eval_score']), row['domain'], row['userid'])
+            insert_set = (uu_id, formatted_date, row['content'], row['type'], row['label'], int(row['score']), 
+                row['domain'], row['userid'])
             rows_to_insert.append(insert_set)
 
         cursor.executemany(insert_stmt, rows_to_insert)
@@ -390,11 +390,10 @@ class MySQLUtility(object):
         rows_to_insert = []
 
         uuid_query = "UPDATE " + self.table_id3 + \
-            " SET score = %s, eval_label = %s, eval_score = %s where id = %s;"
+            " SET score = %s where id = %s;"
 
         for row in batch_data:
-            insert_stmt = (row['score'], row['eval_label'],
-                           row['eval_score'], row['id'])
+            insert_stmt = (row['score'], row['id'])
             rows_to_insert.append(insert_stmt)
         cursor.executemany(uuid_query, rows_to_insert)
         if cursor.rowcount > 0:

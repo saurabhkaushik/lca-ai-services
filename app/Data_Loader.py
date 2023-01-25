@@ -33,7 +33,7 @@ class Data_Loader(object):
                     filestr = report_file.read()
                     if len(filestr) > min_sentence_len:
                         insert_json = {"title": file_name, "content": filestr,  "type": "curated",
-                                    "response": "", "domain": domain, "userid": "admin"}
+                                    "response": "", "score": 0, "report": 'false', "domain": domain, "userid": "admin"}
                         batch_insert.append(insert_json)
                 report_file.close()
         self.dbutil.save_contracts_batch(batch_insert)
@@ -82,8 +82,8 @@ class Data_Loader(object):
                 for sentence in sentences:
                     sentence = str(sentence['sentance'])
                     if len(sentence) > min_sentence_len:
-                        insert_json = {"content": sentence, "type": "seed", "label": label, "eval_label": '',
-                                       "score": 0, "eval_score": 0, "domain": domain, "userid": "admin"}
+                        insert_json = {"content": sentence, "type": "seed", "label": label, 
+                                       "score": 0, "domain": domain, "userid": "admin"}
                         batch_insert.append(insert_json)
         self.dbutil.save_training_data_batch(batch_insert)
         return

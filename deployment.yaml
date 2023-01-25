@@ -23,7 +23,7 @@ spec:
         resources:
           requests:
             cpu: "1"
-            memory: 4Gi
+            memory: 8Gi
             ephemeral-storage: 4Gi
           limits:
             cpu: "1"

@@ -7,5 +7,5 @@ spec:
   selector:
     app: lca-service-app
   ports:
-  - port: 80
+  - port: 443
     targetPort: 8080 

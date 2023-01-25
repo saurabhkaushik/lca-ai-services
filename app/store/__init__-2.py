@@ -10,7 +10,7 @@ from app.common.GCP_Storage import GCP_Storage
 from app.Data_ETL_Pipeline import Data_ETL_Pipeline
 from app.Risk_Score_Service import Risk_Score_Service
 from app.Model_Testing import Model_Testing
-from app.Sentence_Analytics import Sentence_Analytics
+from app.Numerical_Analytics import Sentence_Analytics
 
 def create_app(config, debug=False, testing=False, config_overrides=None):
     apps = Flask(__name__)

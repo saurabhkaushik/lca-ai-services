@@ -7,10 +7,11 @@ spacy
 scipy 
 PyTextRank
 datasets
-scikit-learn
 mysql-connector-python
 waitress
 google-cloud-storage
 parsedatetime
-word2number
 flask_cors
+nltk
+scikit-learn
+num2words
