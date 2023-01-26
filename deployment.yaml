@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: lca-service-app
-        image: asia-south1-docker.pkg.dev/lca-prod-372208/lca-service-app/lca-ai-service:latest
+        image: asia-south1-docker.pkg.dev/lca-prod-375917/lca-service-app/lca-ai-service:latest
         ports:
         - containerPort: 8080  
         env:  

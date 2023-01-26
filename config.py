@@ -7,7 +7,7 @@ class ProductionConfig(Config):
     FLASK_APP='src/app'
     FLASK_ENV='production'
     DOMAINS =['liabilities', 'esg']
-    DB_HOST = '35.223.87.190'
+    DB_HOST = '34.134.254.127'
     DB_USER = 'root'
     DB_PASSWORD = 'Nu123456$$'
     DB_NAME = 'lca_prod'
@@ -17,10 +17,10 @@ class DevelopmentConfig(Config):
     FLASK_APP='src/app'
     FLASK_ENV='development'   
     DOMAINS =['liabilities', 'esg']
-    DB_HOST = '35.223.87.190'
+    DB_HOST = '34.134.254.127'
     DB_USER = 'root'
     DB_PASSWORD = 'Nu123456$$'
-    DB_NAME = 'lca_prod'
+    DB_NAME = 'lca_dev'
     APP_MODE= 'accuracy'
 
 class TestingConfig(Config):
