@@ -7,7 +7,7 @@ docker build -t law-service-app .
 #docker run -p 8081:8080 -it law-service-app 
 
 # Repo in Artifactory 
-gcloud artifacts repositories create lca-service-app --repository-format=docker --location=asia-south1 
+#gcloud artifacts repositories create lca-service-app --repository-format=docker --location=asia-south1 
 
 # Image Push
 gcloud auth configure-docker asia-south1-docker.pkg.dev
@@ -16,7 +16,7 @@ docker push asia-south1-docker.pkg.dev/lca-prod-375917/lca-service-app/lca-ai-se
 
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 # EKS Setup
-gcloud container clusters create-auto "lca-prod-cluster" --region=asia-south1
+#gcloud container clusters create-auto "lca-prod-cluster" --region=asia-south1
 gcloud container clusters get-credentials "lca-prod-cluster" --region asia-south1
 kubectl apply -f deployment.yaml 
 kubectl apply -f service.yaml

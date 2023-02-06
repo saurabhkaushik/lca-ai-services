@@ -69,6 +69,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
     def index():
         return render_template('index.html')
 
+    # Create New Report Data and Respond with Processed Results and Analytics Results (Client - Chrome Ext and UI)
     @apps.route('/report_new_api', methods=('GET', 'POST'))
     def report_new_api():
         post = {}
@@ -93,7 +94,8 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
 
                 if answer == None:
                     answer = ''
-                response, report_analysis = highservice.highlight_text(answer, threshold)
+                response = highservice.highlight_text(answer, threshold)
+                report_analysis = highservice.analyse_results(answer, threshold)
 
                 post = dbutil.get_contracts_id(id)
 
@@ -105,13 +107,12 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
                 post['score_presence_count_json'] = report_analysis['score_presence_count_json']
                 post['score_presence_data'] = report_analysis['score_presence_data']
                 post['class_analysis_data'] = report_analysis['class_analysis_data']
-                #post['class_analysis_key'] = list(report_analysis['class_analysis_data'].keys())
-                #post['class_analysis_value'] = list(report_analysis['class_analysis_data'].values())
         print (post)
         json_resp = jsonify(post)
         json_resp.mimetype = 'application/json'
         return json_resp
 
+    # Create New Company Data and Respond with Processed Results and Analytics Results (Client - UI) 
     @apps.route('/company_new_api', methods=('GET', 'POST'))
     def company_new_api():
         post = {}
@@ -132,7 +133,9 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
 
                 if answer == None:
                     answer = ''
-                response, report_analysis = highservice.highlight_text(answer, threshold)
+
+                response = highservice.highlight_text(answer, threshold)
+                report_analysis = highservice.analyse_results(answer, threshold)
 
                 if (report_analysis['score_report_json'] != None):    
                     score = report_analysis['score_report_json']['score_report_risk_score']
@@ -153,13 +156,12 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
                 post['score_presence_count_json'] = report_analysis['score_presence_count_json']
                 post['score_presence_data'] = report_analysis['score_presence_data']
                 post['class_analysis_data'] = report_analysis['class_analysis_data']
-                #post['class_analysis_key'] = list(report_analysis['class_analysis_data'].keys())
-                #post['class_analysis_value'] = list(report_analysis['class_analysis_data'].values())
         print (post)
         json_resp = jsonify(post)
         json_resp.mimetype = 'application/json'
         return json_resp
 
+    # API Platform - Create New Report Data and Respond with Processed Results and Analytics Results (Client - API Platform)
     @apps.route('/risk_analysis_api', methods=('GET', 'POST'))
     def risk_analysis_api():
         post = {}
@@ -190,6 +192,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         json_resp.mimetype = 'application/json'
         return json_resp
 
+    # Create New Report Data and Respond with Numerical Processed Results and Analytics Results (Client - UI) 
     @apps.route('/num_analysis_api', methods=('GET', 'POST'))
     def num_analysis_api():
         post = {}
@@ -233,6 +236,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         json_resp.mimetype = 'application/json'
         return json_resp
     
+    # Added new Training Data to Training Data table (Client - UI) 
     @apps.route('/training_new_api', methods=('GET', 'POST'))
     def training_new_api():
         if request.method == 'POST':
@@ -259,6 +263,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
             json_resp.mimetype = 'application/json'
             return json_resp
 
+    # Returns Seed List from Database 
     @apps.route('/seed_data_list_api', methods=('GET', 'POST'))
     def seed_data_list_api():
         req_json = request.get_json()
@@ -269,6 +274,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         json_resp.mimetype = 'application/json'
         return json_resp
     
+    # Returns Contract List from Database
     @apps.route('/contract_list_api', methods=('GET', 'POST'))
     def contract_list_api():
         req_json = request.get_json()
@@ -294,6 +300,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         print('Label Total : ', label_total)
         return label_total, amount_total 
 
+    # Admin - Starts Training Service 
     @apps.route('/training_service', methods=('GET', 'POST'))
     def training_service():
         req_json = request.get_json()
@@ -302,6 +309,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
         trans_service.train_model(domain)
         return render_template('index.html')
 
+    # Admin - Start Model Test Service 
     @apps.route('/model_test_service', methods=('GET', 'POST'))
     def model_test_service():
         contract = "This is a very legalised way of doing businesss."
@@ -311,18 +319,21 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
             print("Contract Analysis : ", answer_results)
         return jsonify(answer_results)
     
+    # Admin - Starts ETL Pipeline 
     @apps.route('/etl_service', methods=('GET', 'POST'))
     def etl_service():
         data_etl = Data_ETL_Pipeline(dbutil, domains, mode)
         data_etl.start_process()
         return render_template('index.html')
     
+    # Admin - Start DB Creation Process 
     @apps.route('/db_service', methods=('GET', 'POST'))
     def db_service():
         data_etl = Data_ETL_Pipeline(dbutil, domains, mode)
         data_etl.create_dataset()
         return render_template('index.html')
 
+    # Admin - Start Model Accuracy Testing (Transformer)
     @apps.route('/model_accuracy', methods=('GET', 'POST'))
     def model_accuracy():
         data_test = Model_Testing(dbutil, domains, mode)
